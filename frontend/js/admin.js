@@ -2,6 +2,27 @@
 // Hotel Management System - Admin Dashboard JS
 // ============================================
 
+// Check authentication on page load
+window.addEventListener('load', () => {
+  if (!isLoggedIn()) {
+    window.location.href = 'auth.html';
+  }
+  updateUserInfo();
+  fetchBookings(currentPage);
+});
+
+// Update user info in header
+function updateUserInfo() {
+  const user = getCurrentUser();
+  const userNameEl = document.getElementById('userName');
+  const userEmailEl = document.getElementById('userEmail');
+  
+  if (user && userNameEl && userEmailEl) {
+    userNameEl.textContent = user.name;
+    userEmailEl.textContent = user.email;
+  }
+}
+
 // API Configuration
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -224,7 +245,12 @@ async function fetchBookings(page = 1) {
     }
 
     // Make API request
-    const response = await fetch(`${API_BASE_URL}/bookings?${params}`);
+    const response = await fetch(`${API_BASE_URL}/bookings?${params}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+      },
+    });
     const result = await response.json();
 
     hideLoading();
@@ -282,6 +308,9 @@ async function deleteBooking(bookingId) {
 
     const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}`, {
       method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+      },
     });
 
     const result = await response.json();

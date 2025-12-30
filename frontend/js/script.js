@@ -5,6 +5,26 @@
 // API Configuration
 const API_BASE_URL = 'http://localhost:5000/api';
 
+// Check authentication on page load
+window.addEventListener('load', () => {
+  if (!isLoggedIn()) {
+    window.location.href = 'auth.html';
+  }
+  updateUserInfo();
+});
+
+// Update user info in header
+function updateUserInfo() {
+  const user = getCurrentUser();
+  const userNameEl = document.getElementById('userName');
+  const userEmailEl = document.getElementById('userEmail');
+  
+  if (user && userNameEl && userEmailEl) {
+    userNameEl.textContent = user.name;
+    userEmailEl.textContent = user.email;
+  }
+}
+
 // DOM Elements
 const bookingForm = document.getElementById('bookingForm');
 const successMessage = document.getElementById('successMessage');
@@ -200,6 +220,7 @@ async function submitBooking(bookingData) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`,
       },
       body: JSON.stringify(bookingData),
     });

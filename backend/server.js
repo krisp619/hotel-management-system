@@ -3,6 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 // Initialize Express app
@@ -35,9 +37,90 @@ const connectDB = async () => {
 // Connect to MongoDB
 connectDB();
 
+// ============================================
+// USER SCHEMA (For Authentication)
+// ============================================
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'Please provide your name'],
+      trim: true,
+      minlength: [2, 'Name must be at least 2 characters'],
+    },
+    email: {
+      type: String,
+      required: [true, 'Please provide email address'],
+      unique: true,
+      trim: true,
+      lowercase: true,
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please provide a valid email'],
+    },
+    password: {
+      type: String,
+      required: [true, 'Please provide a password'],
+      minlength: [6, 'Password must be at least 6 characters'],
+      select: false, // Don't include password by default in queries
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true }
+);
+
+// Hash password before saving
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+  
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Method to compare passwords
+userSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Create User Model
+const User = mongoose.model('User', userSchema);
+
+// ============================================
+// AUTHENTICATION MIDDLEWARE
+// ============================================
+const authenticateToken = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    req.userId = decoded.userId;
+    req.userEmail = decoded.email;
+    next();
+  } catch (error) {
+    return res.status(403).json({ error: 'Invalid or expired token' });
+  }
+};
+
 // Define Booking Schema
 const bookingSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     name: {
       type: String,
       required: [true, 'Please provide guest name'],
@@ -89,7 +172,7 @@ const bookingSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Automatically add createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 
@@ -100,10 +183,130 @@ const Booking = mongoose.model('Booking', bookingSchema);
 // API ROUTES
 // ============================================
 
+// ============================================
+// AUTHENTICATION ROUTES
+// ============================================
+
+// Register Route
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { name, email, password, confirmPassword } = req.body;
+
+    // Validation
+    if (!name || !email || !password || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide all required fields',
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Passwords do not match',
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters',
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email already registered',
+      });
+    }
+
+    // Create new user
+    const user = new User({ name, email, password });
+    await user.save();
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '30d' }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Registration successful',
+      token,
+      user: { id: user._id, name: user.name, email: user.email },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Registration failed',
+      error: error.message,
+    });
+  }
+});
+
+// Login Route
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email and password',
+      });
+    }
+
+    // Find user and include password field
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password',
+      });
+    }
+
+    // Compare passwords
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password',
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '30d' }
+    );
+
+    res.json({
+      success: true,
+      message: 'Login successful',
+      token,
+      user: { id: user._id, name: user.name, email: user.email },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Login failed',
+      error: error.message,
+    });
+  }
+});
+
+// ============================================
+
 // Route: POST /api/book-room
-// Description: Create a new booking
-// Request body: { name, email, roomType, checkInDate, checkOutDate }
-app.post('/api/book-room', async (req, res) => {
+// Description: Create a new booking (Protected - requires authentication)
+app.post('/api/book-room', authenticateToken, async (req, res) => {
   try {
     const { name, email, roomType, checkInDate, checkOutDate } = req.body;
 
@@ -117,6 +320,7 @@ app.post('/api/book-room', async (req, res) => {
 
     // Create new booking document
     const booking = new Booking({
+      userId: req.userId,
       name,
       email,
       roomType,
@@ -156,14 +360,13 @@ app.post('/api/book-room', async (req, res) => {
 });
 
 // Route: GET /api/bookings
-// Description: Fetch all bookings (Admin use)
-// Query parameters: page, limit, roomType, email
-app.get('/api/bookings', async (req, res) => {
+// Description: Fetch user's bookings or all bookings (Protected)
+app.get('/api/bookings', authenticateToken, async (req, res) => {
   try {
     const { page = 1, limit = 10, roomType, email } = req.query;
 
-    // Build filter object
-    let filter = {};
+    // Build filter object - only show user's bookings unless they're admin
+    let filter = { userId: req.userId };
     if (roomType) filter.roomType = roomType;
     if (email) filter.email = new RegExp(email, 'i'); // Case-insensitive search
 
@@ -266,10 +469,10 @@ app.put('/api/bookings/:id', async (req, res) => {
 });
 
 // Route: DELETE /api/bookings/:id
-// Description: Delete a booking
-app.delete('/api/bookings/:id', async (req, res) => {
+// Description: Delete a booking (Protected)
+app.delete('/api/bookings/:id', authenticateToken, async (req, res) => {
   try {
-    const booking = await Booking.findByIdAndDelete(req.params.id);
+    const booking = await Booking.findById(req.params.id);
 
     if (!booking) {
       return res.status(404).json({
@@ -277,6 +480,16 @@ app.delete('/api/bookings/:id', async (req, res) => {
         message: 'Booking not found',
       });
     }
+
+    // Check if user owns this booking
+    if (booking.userId.toString() !== req.userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only delete your own bookings',
+      });
+    }
+
+    await Booking.findByIdAndDelete(req.params.id);
 
     res.status(200).json({
       success: true,

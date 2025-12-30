@@ -14,6 +14,12 @@
       <ul class="nav-links">
         <li><a href="index.html">Book Room</a></li>
         <li><a href="admin.html" class="active">Admin Dashboard</a></li>
+        <li style="margin-left: auto;">
+          <span id="userInfo" style="color: white; padding: 10px;">
+            User: <span id="userName">Guest</span>
+          </span>
+          <button onclick="logout()" style="background: #ff6b6b; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Logout</button>
+        </li>
       </ul>
     </div>
   </nav>
@@ -129,6 +135,13 @@
   <footer class="footer">
     <p>&copy; 2025 Hotel Management System. All rights reserved.</p>
   </footer>
+
+  <!-- Auth Script -->
+  <script src="js/auth.js"></script>
+  <!-- Admin Script -->
+  <script src="js/admin.js"></script>
+</body>
+</html>
 
   <!-- Link to JavaScript file -->
   <script src="js/admin.js"></script>
