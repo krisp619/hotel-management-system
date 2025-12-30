@@ -1,0 +1,8 @@
+Endpoint,HTTP Method,Authentication Required,Description,Request Body,Request Headers,Query Parameters,Success Response Code,Error Codes,Notes
+/api/auth/register,POST,No,Create a new user account,"{ email, password, confirm_password }","Content-Type: application/json",N/A,201,"400 (Passwords mismatch, Email exists), 422 (Invalid format)","Password hashing: bcrypt, Token expires in 30 days"
+/api/auth/login,POST,No,Authenticate user and get token,"{ email, password }","Content-Type: application/json",N/A,200,"401 (Invalid credentials), 422 (Missing fields)","Returns access_token with token_type: bearer"
+/api/book-room,POST,Yes (Bearer Token),Create a new room booking,"{ guest_name, email, room_type, check_in, check_out, guests }","Authorization: Bearer {token}, Content-Type: application/json",N/A,201,"401 (Unauthorized), 422 (Invalid data)","Room types: Single, Double, Deluxe. Dates format: YYYY-MM-DD. Guests: 1-10"
+/api/bookings,GET,Yes (Bearer Token),Get all bookings for authenticated user,N/A,"Authorization: Bearer {token}","skip=0, limit=10",200,"401 (Invalid token)","Returns paginated bookings list. Only shows user's own bookings"
+/api/bookings/{booking_id},DELETE,Yes (Bearer Token),Delete/cancel a specific booking,N/A,"Authorization: Bearer {token}",N/A,200,"401 (Unauthorized), 403 (Not owner), 404 (Not found)","User can only delete their own bookings"
+/api/health,GET,No,Check if API is running,N/A,N/A,N/A,200,None,"Always returns OK status if server is up"
+/,GET,No,Get API information,N/A,N/A,N/A,200,None,"Returns API name, version, and docs path"
