@@ -14,7 +14,12 @@ let mongodbConnected = false;
 
 // CORS Configuration - Production Safe
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: [
+    process.env.CORS_ORIGIN || '*',
+    'http://localhost:3000',
+    'http://localhost:8000',
+    'http://23.22.102.15:3000',
+  ],
   credentials: true,
   optionsSuccessStatus: 200,
 };
