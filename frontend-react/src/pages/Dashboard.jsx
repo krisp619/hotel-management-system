@@ -34,7 +34,11 @@ export const Dashboard = () => {
     setMessage('');
 
     try {
-      await bookingAPI.createBooking(formData);
+      const bookingData = {
+        ...formData,
+        roomType: selectedRoom, // Add roomType here!
+      };
+      await bookingAPI.createBooking(bookingData);
       setMessage('✓ Booking created successfully!');
       setFormData({
         name: user?.name || '',

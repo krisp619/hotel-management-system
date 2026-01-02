@@ -7,6 +7,8 @@ export const Header = () => {
   const navigate = useNavigate();
   const user = getUser();
 
+  console.log('Header rendered, isAuthenticated:', isAuthenticated());
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -15,7 +17,7 @@ export const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <h1>🏨 Hotel Management</h1>
+        <h1>Hotel Management</h1>
         <nav className={styles.nav}>
           {isAuthenticated() ? (
             <>

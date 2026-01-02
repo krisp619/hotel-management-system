@@ -5,12 +5,9 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import { Bookings } from './pages/Bookings';
-import { useAuth } from './hooks/useAuth';
 import './App.css';
 
 function App() {
-  const { isAuthenticated } = useAuth();
-
   return (
     <Router>
       <Header />

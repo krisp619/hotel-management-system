@@ -12,6 +12,8 @@ export const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  console.log('Login component mounted');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -29,36 +31,52 @@ export const Login = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.form}>
-        <h2>Login</h2>
-        {error && <div className={styles.error}>{error}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
-            <label>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-        <p>
-          Don't have an account? <Link to="/register">Register here</Link>
-        </p>
+    <div className={styles.pageContainer}>
+      <div className={styles.mainContent}>
+        <div className={styles.formContainer}>
+          <h3>Sign In</h3>
+          <p className={styles.subtitle}>to access Hotel Booking System</p>
+          
+          {error && <div className={styles.error}>{error}</div>}
+          
+          <form onSubmit={handleSubmit}>
+            <div className={styles.formGroup}>
+              <label htmlFor="email">Email Address *</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            
+            <div className={styles.formGroup}>
+              <label htmlFor="password">Password *</label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            
+            <div className={styles.forgotPassword}>
+              <Link to="#">Forgot your password?</Link>
+            </div>
+            
+            <button type="submit" disabled={loading} className={styles.submitBtn}>
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+          
+          <p className={styles.registerLink}>
+            Don't have an account? <Link to="/register">Register here</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
