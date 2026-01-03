@@ -10,5 +10,17 @@ export default defineConfig({
   build: {
     target: 'esnext',
     minify: 'terser',
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false, // Set to true for debugging production issues
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'router-vendor': ['react-router-dom'],
+        },
+      },
+    },
   },
+  base: '/', // Important for S3 root hosting
 })
