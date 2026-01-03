@@ -12,15 +12,19 @@ let mongodbConnected = false;
 // MIDDLEWARE
 // ============================================
 
-// CORS Configuration - Production Safe
+// CORS Configuration - API Only, S3 Frontend Safe
 const corsOptions = {
-  origin: [
-    process.env.CORS_ORIGIN || '*',
-    'http://localhost:3000',
-    'http://localhost:8000',
-    'http://23.22.102.15:3000',
-  ],
+  origin: process.env.CORS_ORIGIN 
+    ? process.env.CORS_ORIGIN.split(',').map(url => url.trim())
+    : [
+        'http://localhost:3001',
+        'http://localhost:3000',
+        'http://hotel-management-frontend.s3-website-us-east-1.amazonaws.com',
+        'https://hotel-management-frontend.s3-website-us-east-1.amazonaws.com',
+      ],
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
@@ -63,12 +67,10 @@ const connectDB = async () => {
   } catch (error) {
     mongodbConnected = false;
     console.error('✗ MongoDB Connection Error:', error.message);
-    // Retry connection after 5 seconds
     setTimeout(connectDB, 5000);
   }
 };
 
-// Monitor MongoDB connection events
 mongoose.connection.on('connected', () => {
   mongodbConnected = true;
   console.log('✓ Mongoose connected to MongoDB');
@@ -84,11 +86,10 @@ mongoose.connection.on('error', (error) => {
   console.error('✗ MongoDB connection error:', error.message);
 });
 
-// Initialize MongoDB connection
 connectDB();
 
 // ============================================
-// USER SCHEMA
+// SCHEMAS
 // ============================================
 
 const userSchema = new mongoose.Schema({
@@ -115,7 +116,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// Hash password before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   try {
@@ -126,38 +126,11 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-// Compare password method
 userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
 const User = mongoose.model('User', userSchema);
-
-// ============================================
-// AUTHENTICATION MIDDLEWARE
-// ============================================
-
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  
-  if (!token) {
-    return res.status(401).json({ error: 'Access token required' });
-  }
-  
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    req.userId = decoded.userId;
-    next();
-  } catch (error) {
-    console.error('Token verification failed:', error.message);
-    res.status(403).json({ error: 'Invalid or expired token' });
-  }
-};
-
-// ============================================
-// BOOKING SCHEMA
-// ============================================
 
 const bookingSchema = new mongoose.Schema({
   userId: { 
@@ -199,10 +172,54 @@ const bookingSchema = new mongoose.Schema({
 const Booking = mongoose.model('Booking', bookingSchema);
 
 // ============================================
-// API ROUTES
+// AUTHENTICATION MIDDLEWARE
 // ============================================
 
-// Health Check Endpoint - Production Ready
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    req.userId = decoded.userId;
+    next();
+  } catch (error) {
+    console.error('Token verification failed:', error.message);
+    res.status(403).json({ error: 'Invalid or expired token' });
+  }
+};
+
+// ============================================
+// API ROUTES - ROOT
+// ============================================
+
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'Hotel Management System - API Server',
+    version: '1.0.0',
+    status: 'running',
+    description: 'API-only backend. Frontend served separately on AWS S3.',
+    endpoints: {
+      health: 'GET /api/health',
+      register: 'POST /api/auth/register',
+      login: 'POST /api/auth/login',
+      bookings: 'GET /api/bookings',
+      create_booking: 'POST /api/book-room',
+      update_booking: 'PUT /api/bookings/:id',
+      delete_booking: 'DELETE /api/bookings/:id',
+    },
+    documentation: 'See API_ENDPOINTS_REFERENCE.md on GitHub',
+  });
+});
+
+// ============================================
+// API ROUTES - HEALTH
+// ============================================
+
 app.get('/api/health', (req, res) => {
   try {
     res.status(200).json({
@@ -221,12 +238,14 @@ app.get('/api/health', (req, res) => {
   }
 });
 
-// Register Endpoint
+// ============================================
+// API ROUTES - AUTHENTICATION
+// ============================================
+
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, password, confirmPassword } = req.body;
     
-    // Validation
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -239,17 +258,14 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
     
-    // Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: 'Email already registered' });
     }
     
-    // Create user
     const user = new User({ name, email, password });
     await user.save();
     
-    // Generate token
     const token = jwt.sign(
       { userId: user._id }, 
       process.env.JWT_SECRET || 'your-secret-key',
@@ -267,29 +283,24 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// Login Endpoint
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    // Validation
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password required' });
     }
     
-    // Find user
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    // Verify password
     const isValid = await user.comparePassword(password);
     if (!isValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    // Generate token
     const token = jwt.sign(
       { userId: user._id }, 
       process.env.JWT_SECRET || 'your-secret-key',
@@ -299,6 +310,7 @@ app.post('/api/auth/login', async (req, res) => {
     res.json({ 
       message: 'Login successful',
       token, 
+      userId: user._id,
       user: { id: user._id, name: user.name, email } 
     });
   } catch (error) {
@@ -307,17 +319,18 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Create Booking
+// ============================================
+// API ROUTES - BOOKINGS
+// ============================================
+
 app.post('/api/book-room', authenticateToken, async (req, res) => {
   try {
     const { name, email, roomType, checkInDate, checkOutDate } = req.body;
     
-    // Validation
     if (!name || !email || !roomType || !checkInDate || !checkOutDate) {
       return res.status(400).json({ error: 'All fields are required' });
     }
     
-    // Create booking
     const booking = new Booking({
       userId: req.userId,
       name,
@@ -330,6 +343,7 @@ app.post('/api/book-room', authenticateToken, async (req, res) => {
     await booking.save();
     res.status(201).json({ 
       message: 'Booking created successfully',
+      _id: booking._id,
       data: booking 
     });
   } catch (error) {
@@ -338,7 +352,6 @@ app.post('/api/book-room', authenticateToken, async (req, res) => {
   }
 });
 
-// Get User's Bookings
 app.get('/api/bookings', authenticateToken, async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
@@ -362,13 +375,16 @@ app.get('/api/bookings', authenticateToken, async (req, res) => {
   }
 });
 
-// Get Single Booking
-app.get('/api/bookings/:id', async (req, res) => {
+app.get('/api/bookings/:id', authenticateToken, async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
     
     if (!booking) {
       return res.status(404).json({ error: 'Booking not found' });
+    }
+    
+    if (booking.userId.toString() !== req.userId) {
+      return res.status(403).json({ error: 'Unauthorized' });
     }
     
     res.json({ data: booking });
@@ -378,24 +394,28 @@ app.get('/api/bookings/:id', async (req, res) => {
   }
 });
 
-// Update Booking
-app.put('/api/bookings/:id', async (req, res) => {
+app.put('/api/bookings/:id', authenticateToken, async (req, res) => {
   try {
     const { name, email, roomType, checkInDate, checkOutDate } = req.body;
     
-    const booking = await Booking.findByIdAndUpdate(
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+    
+    if (booking.userId.toString() !== req.userId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    
+    const updated = await Booking.findByIdAndUpdate(
       req.params.id,
       { name, email, roomType, checkInDate, checkOutDate },
       { new: true, runValidators: true }
     );
     
-    if (!booking) {
-      return res.status(404).json({ error: 'Booking not found' });
-    }
-    
     res.json({ 
       message: 'Booking updated successfully',
-      data: booking 
+      data: updated 
     });
   } catch (error) {
     console.error('Update booking error:', error);
@@ -403,7 +423,6 @@ app.put('/api/bookings/:id', async (req, res) => {
   }
 });
 
-// Delete Booking
 app.delete('/api/bookings/:id', authenticateToken, async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
@@ -412,17 +431,13 @@ app.delete('/api/bookings/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Booking not found' });
     }
     
-    // Verify ownership
     if (booking.userId.toString() !== req.userId) {
-      return res.status(403).json({ error: 'You can only delete your own bookings' });
+      return res.status(403).json({ error: 'Unauthorized' });
     }
     
     await Booking.findByIdAndDelete(req.params.id);
     
-    res.json({ 
-      message: 'Booking deleted successfully',
-      data: booking 
-    });
+    res.json({ message: 'Booking deleted successfully' });
   } catch (error) {
     console.error('Delete booking error:', error);
     res.status(500).json({ error: error.message });
@@ -433,16 +448,15 @@ app.delete('/api/bookings/:id', authenticateToken, async (req, res) => {
 // ERROR HANDLING
 // ============================================
 
-// 404 Handler
 app.use((req, res) => {
   res.status(404).json({ 
     error: 'Route not found',
     path: req.path,
     method: req.method,
+    message: 'Use /api/* endpoints. See GET / for full API list.',
   });
 });
 
-// Global error handler
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(err.status || 500).json({
@@ -460,27 +474,24 @@ const HOST = '0.0.0.0';
 const server = app.listen(PORT, HOST, () => {
   console.log('');
   console.log('========================================');
-  console.log('✓ Express Server Started Successfully');
+  console.log('✓ Express Server Started - API Only');
   console.log('========================================');
   console.log(`Port: ${PORT}`);
   console.log(`Host: ${HOST}`);
-  console.log(`Public URL: http://<YOUR_EC2_PUBLIC_IP>:${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`MongoDB: ${mongodbConnected ? '✓ connected' : '⏳ connecting...'}`);
-  console.log(`Health: http://localhost:${PORT}/api/health`);
+  console.log(`CORS Enabled: Yes (S3 + Localhost)`);
+  console.log(`Health Check: GET http://localhost:${PORT}/api/health`);
+  console.log(`Frontend: AWS S3 (separate deployment)`);
   console.log('========================================');
   console.log('');
 });
-
-// ============================================
-// GRACEFUL SHUTDOWN
-// ============================================
 
 process.on('SIGTERM', () => {
   console.log('SIGTERM received. Shutting down gracefully...');
   server.close(() => {
     console.log('HTTP server closed');
-    mongoose.connection.close(false, () => {
+    mongoose.connection.close().then(() => {
       console.log('MongoDB connection closed');
       process.exit(0);
     });
@@ -491,7 +502,7 @@ process.on('SIGINT', () => {
   console.log('SIGINT received. Shutting down gracefully...');
   server.close(() => {
     console.log('HTTP server closed');
-    mongoose.connection.close(false, () => {
+    mongoose.connection.close().then(() => {
       console.log('MongoDB connection closed');
       process.exit(0);
     });
