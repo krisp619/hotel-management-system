@@ -4,10 +4,6 @@
     Automated S3 Deployment Script for Hotel Management System Frontend
 .DESCRIPTION
     Builds React app and deploys to AWS S3 with proper configuration
-.PARAMETER BucketName
-    S3 bucket name (must be globally unique)
-.PARAMETER Region
-    AWS region (default: us-east-1)
 #>
 
 param(
@@ -18,148 +14,125 @@ param(
     [string]$Region = "us-east-1"
 )
 
+Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Hotel Management System - S3 Deployment" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
-# Color codes
-$Success = @{ ForegroundColor = 'Green' }
-$Error_Color = @{ ForegroundColor = 'Red' }
-$Warning = @{ ForegroundColor = 'Yellow' }
-$Info = @{ ForegroundColor = 'Cyan' }
-
-# Step 1: Check AWS CLI
-Write-Host "`n[1/6] Checking AWS CLI..." @Info
+# Check AWS CLI
+Write-Host "`n[1/5] Checking AWS CLI..." -ForegroundColor Cyan
 $awsCmd = Get-Command aws -ErrorAction SilentlyContinue
 if (-not $awsCmd) {
-    Write-Host "❌ AWS CLI not found!" @Error_Color
-    Write-Host "Download from: https://aws.amazon.com/cli/" @Warning
+    Write-Host "[FAIL] AWS CLI not found!" -ForegroundColor Red
+    Write-Host "Download: https://aws.amazon.com/cli/" -ForegroundColor Yellow
     exit 1
 }
-Write-Host "✅ AWS CLI found" @Success
+Write-Host "[OK] AWS CLI found" -ForegroundColor Green
 
-# Step 2: Check credentials
-Write-Host "`n[2/6] Checking AWS credentials..." @Info
+# Check credentials
+Write-Host "`n[2/5] Checking AWS credentials..." -ForegroundColor Cyan
 try {
     $identity = aws sts get-caller-identity --region $Region 2>$null | ConvertFrom-Json
-    Write-Host "✅ AWS credentials valid (Account: $($identity.Account))" @Success
+    Write-Host "[OK] AWS credentials valid" -ForegroundColor Green
 }
 catch {
-    Write-Host "❌ AWS credentials not configured!" @Error_Color
-    Write-Host "Run: aws configure" @Warning
+    Write-Host "[FAIL] AWS credentials not configured!" -ForegroundColor Red
+    Write-Host "Run: aws configure" -ForegroundColor Yellow
     exit 1
 }
 
-# Step 3: Build React app
-Write-Host "`n[3/6] Building React application..." @Info
-$projectRoot = Split-Path -Parent $PSScriptRoot
-$frontendPath = Join-Path $projectRoot "frontend-react"
-
+# Build React app
+Write-Host "`n[3/5] Building React application..." -ForegroundColor Cyan
+$frontendPath = Join-Path (Get-Location) "frontend-react"
 if (-not (Test-Path (Join-Path $frontendPath "package.json"))) {
-    Write-Host "❌ frontend-react/package.json not found!" @Error_Color
+    Write-Host "[FAIL] frontend-react/package.json not found!" -ForegroundColor Red
     exit 1
 }
 
 Push-Location $frontendPath
-npm run build
+npm run build 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Build failed!" @Error_Color
+    Write-Host "[FAIL] Build failed!" -ForegroundColor Red
     Pop-Location
     exit 1
 }
 Pop-Location
-Write-Host "✅ Build successful" @Success
+Write-Host "[OK] Build successful" -ForegroundColor Green
 
-# Step 4: Verify dist folder
-Write-Host "`n[4/6] Verifying dist folder..." @Info
+# Verify dist folder
+Write-Host "`n[4/5] Verifying dist folder..." -ForegroundColor Cyan
 $distPath = Join-Path $frontendPath "dist"
 if (-not (Test-Path $distPath)) {
-    Write-Host "❌ dist/ folder not found!" @Error_Color
+    Write-Host "[FAIL] dist/ folder not found!" -ForegroundColor Red
     exit 1
 }
-$indexHtml = Join-Path $distPath "index.html"
-if (-not (Test-Path $indexHtml)) {
-    Write-Host "❌ index.html not found in dist/" @Error_Color
+if (-not (Test-Path (Join-Path $distPath "index.html"))) {
+    Write-Host "[FAIL] index.html not found in dist/" -ForegroundColor Red
     exit 1
 }
-Write-Host "✅ dist/ folder ready for upload" @Success
+Write-Host "[OK] dist/ folder ready for upload" -ForegroundColor Green
 
-# Step 5: Create/Configure S3 bucket
-Write-Host "`n[5/6] Setting up S3 bucket..." @Info
+# Setup S3
+Write-Host "`n[5/5] Setting up S3 bucket..." -ForegroundColor Cyan
 
-# Check if bucket exists
+# Create bucket if needed
 $bucketExists = aws s3 ls "s3://$BucketName" --region $Region 2>$null
 if (-not $bucketExists) {
-    Write-Host "Creating S3 bucket: $BucketName"
+    Write-Host "[INFO] Creating S3 bucket: $BucketName" -ForegroundColor Yellow
     aws s3 mb "s3://$BucketName" --region $Region
 }
 
 # Enable website hosting
-Write-Host "Configuring website hosting..."
-aws s3 website "s3://$BucketName" `
-    --index-document index.html `
-    --error-document index.html `
-    --region $Region
+aws s3 website "s3://$BucketName" --index-document index.html --error-document index.html --region $Region 2>$null
 
-# Make bucket public
-Write-Host "Applying public access policy..."
-$policy = @{
-    Version = "2012-10-17"
-    Statement = @(
-        @{
-            Effect = "Allow"
-            Principal = "*"
-            Action = "s3:GetObject"
-            Resource = "arn:aws:s3:::$BucketName/*"
-        }
-    )
-} | ConvertTo-Json -Depth 10
+# Set public read policy
+$bucketPolicy = @"
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicRead",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::$BucketName/*"
+    }
+  ]
+}
+"@
 
-$tempPolicy = New-TemporaryFile
-$policy | Out-File -FilePath $tempPolicy.FullName -Encoding UTF8
-aws s3api put-bucket-policy --bucket $BucketName --policy file://$tempPolicy.FullName --region $Region
-Remove-Item $tempPolicy
+$tempFile = [System.IO.Path]::GetTempFileName()
+Set-Content -Path $tempFile -Value $bucketPolicy -Encoding UTF8
+aws s3api put-bucket-policy --bucket $BucketName --policy file://$tempFile --region $Region 2>$null
+Remove-Item $tempFile
 
-Write-Host "✅ S3 bucket configured" @Success
+Write-Host "[OK] S3 bucket configured" -ForegroundColor Green
 
-# Step 6: Upload to S3
-Write-Host "`n[6/6] Uploading to S3..." @Info
+# Upload files
+Write-Host "`nUploading files to S3..." -ForegroundColor Cyan
+aws s3 sync $distPath "s3://$BucketName/" --region $Region --delete --cache-control "no-cache" 2>&1 | Out-Null
+Write-Host "[OK] Files uploaded" -ForegroundColor Green
 
-# Upload assets with long cache
-Write-Host "Uploading assets (with cache)..."
-$assetsPath = Join-Path $distPath "assets"
-aws s3 sync $assetsPath "s3://$BucketName/assets" `
-    --cache-control "public, max-age=31536000" `
-    --delete `
-    --region $Region
-
-# Upload index.html without cache
-Write-Host "Uploading index.html (no cache)..."
-aws s3 cp $indexHtml "s3://$BucketName/index.html" `
-    --content-type "text/html; charset=utf-8" `
-    --cache-control "no-cache, no-store, must-revalidate" `
-    --region $Region
-
-Write-Host "✅ Upload complete" @Success
-
-# Final summary
-Write-Host "`n========================================" -ForegroundColor Green
-Write-Host "✅ Deployment Complete!" -ForegroundColor Green
+# Summary
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Green
+Write-Host "DEPLOYMENT COMPLETE" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 
 $websiteUrl = "http://$BucketName.s3-website-$Region.amazonaws.com"
-Write-Host "`n📍 Website URL: $websiteUrl" @Info
-Write-Host "`n🧪 Test URLs:"
-Write-Host "   - Home: $websiteUrl/"
-Write-Host "   - Login: $websiteUrl/login"
-Write-Host "   - Register: $websiteUrl/register"
-Write-Host "   - Bookings: $websiteUrl/bookings"
-
-Write-Host "`n💡 Next steps:"
-Write-Host "   1. Open the website URL in browser"
-Write-Host "   2. Register a new user"
-Write-Host "   3. Test booking a room"
-Write-Host "   4. Verify API calls to backend (check Network tab)"
-
-Write-Host "`n📝 Backend must be running at: http://23.22.102.15:5000"
-Write-Host "`n✨ Deployment successful!"
+Write-Host ""
+Write-Host "Website URL: $websiteUrl" -ForegroundColor Green
+Write-Host ""
+Write-Host "Test URLs:" -ForegroundColor Cyan
+Write-Host "  Login:    $websiteUrl/login" 
+Write-Host "  Register: $websiteUrl/register"
+Write-Host "  Bookings: $websiteUrl/bookings"
+Write-Host ""
+Write-Host "Next steps:" -ForegroundColor Yellow
+Write-Host "  1. Open website URL in browser"
+Write-Host "  2. Register a new user"
+Write-Host "  3. Test booking a room"
+Write-Host "  4. Check Network tab for API calls"
+Write-Host ""
+Write-Host "Backend API: http://23.22.102.15:5000" -ForegroundColor Yellow
+Write-Host ""
