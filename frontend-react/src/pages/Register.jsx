@@ -17,25 +17,42 @@ export const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Client-side validation
+    if (!name || !email || !password || !confirmPassword) {
+      setError('All fields are required');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      console.log('Attempting to register with:', { name, email });
-      const response = await authAPI.register({
-        name,
-        email,
-        password,
-        confirmPassword,
-      });
+      // Only send name, email, password (NOT confirmPassword)
+      const payload = { name, email, password };
+      console.log('Register request payload:', payload);
+
+      const response = await authAPI.register(payload);
       console.log('Registration successful:', response.data);
+
       login(response.data.token, response.data.user);
       navigate('/');
     } catch (err) {
-      const errorMsg = err.response?.data?.error || 'Registration failed';
+      const errorMsg = err.response?.data?.error || err.message || 'Registration failed';
       console.error('Registration error:', {
         status: err.response?.status,
         data: err.response?.data,
-        message: err.message
+        message: err.message,
+        fullError: err
       });
       setError(errorMsg);
     } finally {

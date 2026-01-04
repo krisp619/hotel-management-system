@@ -244,28 +244,28 @@ app.get('/api/health', (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { name, email, password, confirmPassword } = req.body;
+    const { name, email, password } = req.body;
     
+    // Validate required fields
     if (!name || !email || !password) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-    
-    if (password !== confirmPassword) {
-      return res.status(400).json({ error: 'Passwords do not match' });
+      return res.status(400).json({ error: 'Missing required fields: name, email, password' });
     }
 
     if (password.length < 6) {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
     
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: 'Email already registered' });
     }
     
+    // Create new user
     const user = new User({ name, email, password });
     await user.save();
     
+    // Generate JWT token
     const token = jwt.sign(
       { userId: user._id }, 
       process.env.JWT_SECRET || 'your-secret-key',
@@ -279,7 +279,7 @@ app.post('/api/auth/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Registration failed. Please try again.' });
   }
 });
 

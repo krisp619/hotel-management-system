@@ -20,11 +20,29 @@ export const Login = () => {
     setLoading(true);
 
     try {
-      const response = await authAPI.login({ email, password });
+      // Validate inputs
+      if (!email || !password) {
+        setError('Email and password are required');
+        setLoading(false);
+        return;
+      }
+
+      const payload = { email, password };
+      console.log('Login request payload:', payload);
+
+      const response = await authAPI.login(payload);
+      console.log('Login successful:', response.data);
+
       login(response.data.token, response.data.user);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      const errorMsg = err.response?.data?.error || err.message || 'Login failed';
+      console.error('Login error:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message
+      });
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
