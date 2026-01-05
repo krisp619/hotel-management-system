@@ -23,8 +23,6 @@ const corsOptions = {
         'https://hotel-management-frontend.s3-website-us-east-1.amazonaws.com',
       ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
@@ -67,6 +65,7 @@ const connectDB = async () => {
   } catch (error) {
     mongodbConnected = false;
     console.error('✗ MongoDB Connection Error:', error.message);
+    // Retry connection after 5 seconds
     setTimeout(connectDB, 5000);
   }
 };
