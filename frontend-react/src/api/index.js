@@ -1,7 +1,5 @@
 import axios from 'axios';
-
-// Production API Base URL - AWS EC2 Backend
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://18.215.168.203:5000/api';
+import { API_BASE_URL } from '../config/apiConfig';
 
 console.log('🚀 API Configuration:');
 console.log('   Base URL:', API_BASE_URL);
@@ -74,21 +72,21 @@ api.interceptors.response.use(
 );
 
 export const authAPI = {
-  register: (data) => api.post('/api/auth/register', data),
-  login: (data) => api.post('/api/auth/login', data),
+  register: (data) => api.post('/auth/register', data),
+  login: (data) => api.post('/auth/login', data),
 };
 
 export const bookingAPI = {
-  createBooking: (data) => api.post('/api/book-room', data),
+  createBooking: (data) => api.post('/book-room', data),
   getBookings: (page = 1, limit = 10) =>
-    api.get('/api/bookings', { params: { page, limit } }),
-  getBookingById: (id) => api.get(`/api/bookings/${id}`),
-  updateBooking: (id, data) => api.put(`/api/bookings/${id}`, data),
-  deleteBooking: (id) => api.delete(`/api/bookings/${id}`),
+    api.get('/bookings', { params: { page, limit } }),
+  getBookingById: (id) => api.get(`/bookings/${id}`),
+  updateBooking: (id, data) => api.put(`/bookings/${id}`, data),
+  deleteBooking: (id) => api.delete(`/bookings/${id}`),
 };
 
 export const healthAPI = {
-  check: () => api.get('/api/health'),
+  check: () => api.get('/health'),
 };
 
 export default api;
