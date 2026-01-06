@@ -14,11 +14,43 @@ let mongodbConnected = false;
 
 // CORS Configuration - Production Safe
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:5173',
+      'http://hotel-frontend-krishna.s3-website-us-east-1.amazonaws.com',
+      'https://hotel-frontend-krishna.s3-website-us-east-1.amazonaws.com',
+    ];
+
+    // Parse CORS_ORIGIN from .env if provided
+    if (process.env.CORS_ORIGIN) {
+      const envOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim());
+      allowedOrigins.push(...envOrigins);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -26,7 +58,29 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  const startTime = Date.now();
+  
+  // Set response timeout (prevent hanging requests)
+  const responseTimeout = setTimeout(() => {
+    if (!res.headersSent) {
+      console.error(`TIMEOUT: ${req.method} ${req.path} - No response after 25 seconds`);
+      res.status(504).json({ 
+        success: false,
+        error: 'Request timeout',
+        code: 'TIMEOUT'
+      });
+    }
+  }, 25000); // 25 second timeout
+  
+  // Track response completion
+  const originalSend = res.send;
+  res.send = function(data) {
+    clearTimeout(responseTimeout);
+    const duration = Date.now() - startTime;
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path} [${res.statusCode}] (${duration}ms)`);
+    return originalSend.call(this, data);
+  };
+  
   next();
 });
 
@@ -219,86 +273,231 @@ app.get('/api/health', (req, res) => {
 // Register Endpoint
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { name, email, password, confirmPassword } = req.body;
-    
-    // Validation
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-    
-    if (password !== confirmPassword) {
-      return res.status(400).json({ error: 'Passwords do not match' });
+    // Verify MongoDB is connected
+    if (!mongodbConnected) {
+      console.warn('Register: MongoDB not connected');
+      return res.status(503).json({ 
+        success: false,
+        error: 'Database service temporarily unavailable',
+        code: 'DB_UNAVAILABLE'
+      });
     }
 
+    const { name, email, password, confirmPassword } = req.body;
+    
+    // ========== VALIDATION ==========
+    // Check required fields
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Name is required and must be a non-empty string' 
+      });
+    }
+    
+    if (!email || typeof email !== 'string' || email.trim().length === 0) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Email is required and must be a non-empty string' 
+      });
+    }
+    
+    if (!password || typeof password !== 'string' || password.length === 0) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Password is required' 
+      });
+    }
+    
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Invalid email format' 
+      });
+    }
+    
+    // Password validation
     if (password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+      return res.status(400).json({ 
+        success: false,
+        error: 'Password must be at least 6 characters' 
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Passwords do not match' 
+      });
     }
     
-    // Check if user exists
-    const existingUser = await User.findOne({ email });
+    // ========== CHECK EXISTING USER ==========
+    const normalizedEmail = email.toLowerCase().trim();
+    const existingUser = await User.findOne({ email: normalizedEmail });
+    
     if (existingUser) {
-      return res.status(400).json({ error: 'Email already registered' });
+      return res.status(409).json({ 
+        success: false,
+        error: 'Email already registered',
+        code: 'USER_EXISTS'
+      });
     }
     
-    // Create user
-    const user = new User({ name, email, password });
-    await user.save();
+    // ========== CREATE USER ==========
+    const user = new User({ 
+      name: name.trim(), 
+      email: normalizedEmail, 
+      password 
+    });
     
-    // Generate token
+    const savedUser = await user.save();
+    
+    // ========== GENERATE TOKEN ==========
     const token = jwt.sign(
-      { userId: user._id }, 
+      { userId: savedUser._id }, 
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '30d' }
     );
     
-    res.status(201).json({ 
+    // ========== RETURN SUCCESS ==========
+    console.log(`✓ User registered: ${normalizedEmail}`);
+    return res.status(201).json({ 
+      success: true,
       message: 'Registration successful',
       token, 
-      user: { id: user._id, name, email } 
+      user: { 
+        id: savedUser._id, 
+        name: savedUser.name, 
+        email: savedUser.email 
+      } 
     });
+    
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: error.message });
+    console.error('Registration error:', error.message, error.code);
+    
+    // Handle duplicate key error
+    if (error.code === 11000) {
+      return res.status(409).json({ 
+        success: false,
+        error: 'Email already registered',
+        code: 'DUPLICATE_EMAIL'
+      });
+    }
+    
+    // Validation error
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(e => e.message);
+      return res.status(400).json({ 
+        success: false,
+        error: messages.join(', '),
+        code: 'VALIDATION_ERROR'
+      });
+    }
+    
+    // Generic server error
+    return res.status(500).json({ 
+      success: false,
+      error: 'Registration failed due to server error',
+      code: 'INTERNAL_ERROR'
+    });
   }
 });
 
 // Login Endpoint
 app.post('/api/auth/login', async (req, res) => {
   try {
+    // Verify MongoDB is connected
+    if (!mongodbConnected) {
+      console.warn('Login: MongoDB not connected');
+      return res.status(503).json({ 
+        success: false,
+        error: 'Database service temporarily unavailable',
+        code: 'DB_UNAVAILABLE'
+      });
+    }
+
     const { email, password } = req.body;
     
-    // Validation
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password required' });
+    // ========== VALIDATION ==========
+    if (!email || typeof email !== 'string' || email.trim().length === 0) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Email is required' 
+      });
     }
     
-    // Find user
-    const user = await User.findOne({ email }).select('+password');
+    if (!password || typeof password !== 'string' || password.length === 0) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Password is required' 
+      });
+    }
+    
+    // ========== FIND USER ==========
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
+    
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      // Don't reveal whether email exists
+      return res.status(401).json({ 
+        success: false,
+        error: 'Invalid email or password',
+        code: 'INVALID_CREDENTIALS'
+      });
     }
     
-    // Verify password
-    const isValid = await user.comparePassword(password);
-    if (!isValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    // ========== VERIFY PASSWORD ==========
+    let isPasswordValid = false;
+    try {
+      isPasswordValid = await user.comparePassword(password);
+    } catch (hashError) {
+      console.error('Password comparison error:', hashError.message);
+      return res.status(500).json({ 
+        success: false,
+        error: 'Authentication failed',
+        code: 'AUTH_ERROR'
+      });
     }
     
-    // Generate token
+    if (!isPasswordValid) {
+      // Don't reveal whether password is wrong
+      return res.status(401).json({ 
+        success: false,
+        error: 'Invalid email or password',
+        code: 'INVALID_CREDENTIALS'
+      });
+    }
+    
+    // ========== GENERATE TOKEN ==========
     const token = jwt.sign(
       { userId: user._id }, 
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '30d' }
     );
     
-    res.json({ 
+    // ========== RETURN SUCCESS ==========
+    console.log(`✓ User logged in: ${normalizedEmail}`);
+    return res.status(200).json({ 
+      success: true,
       message: 'Login successful',
       token, 
-      user: { id: user._id, name: user.name, email } 
+      user: { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email 
+      } 
     });
+    
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: error.message });
+    console.error('Login error:', error.message);
+    
+    // Generic server error
+    return res.status(500).json({ 
+      success: false,
+      error: 'Login failed due to server error',
+      code: 'INTERNAL_ERROR'
+    });
   }
 });
 
