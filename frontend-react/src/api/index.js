@@ -1,17 +1,18 @@
 import axios from 'axios';
 
-// Get and clean API base URL (remove newline characters and trim whitespace)
-const getRawURL = () => import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-const API_BASE_URL = getRawURL().trim(); // Remove any whitespace/newlines
+// Production API Base URL - AWS EC2 Backend
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://18.215.168.203:5000/api';
 
-console.log('API_BASE_URL configured:', API_BASE_URL);
+console.log('🚀 API Configuration:');
+console.log('   Base URL:', API_BASE_URL);
+console.log('   Timeout: 30 seconds');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: 30000, // 30 seconds for production stability
 });
 
 // Request interceptor: Add token and log requests
@@ -43,15 +44,26 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('API Error:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-      url: error.config?.url,
-    });
+    // Comprehensive error logging
+    console.error('❌ API Error Details:');
+    console.error('   Status:', error.response?.status);
+    console.error('   Message:', error.message);
+    console.error('   Data:', error.response?.data);
+    console.error('   URL:', error.config?.url);
+    console.error('   Method:', error.config?.method);
+    
+    // Timeout detection
+    if (error.code === 'ECONNABORTED') {
+      console.error('   Type: REQUEST TIMEOUT (30s exceeded)');
+    } else if (!error.response) {
+      console.error('   Type: NETWORK ERROR (no response from server)');
+    } else {
+      console.error('   Type: API ERROR');
+    }
 
     // Handle 403 Forbidden - token expired
     if (error.response?.status === 403) {
+      console.warn('🔐 Token expired - redirecting to login');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';

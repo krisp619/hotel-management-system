@@ -653,16 +653,27 @@ const HOST = '0.0.0.0';
 
 const server = app.listen(PORT, HOST, () => {
   console.log('');
-  console.log('========================================');
-  console.log('✓ Express Server Started Successfully');
-  console.log('========================================');
-  console.log(`Port: ${PORT}`);
-  console.log(`Host: ${HOST}`);
-  console.log(`Public URL: http://<YOUR_EC2_PUBLIC_IP>:${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`MongoDB: ${mongodbConnected ? '✓ connected' : '⏳ connecting...'}`);
-  console.log(`Health: http://localhost:${PORT}/api/health`);
-  console.log('========================================');
+  console.log('╔════════════════════════════════════════════════════════════╗');
+  console.log('║   🏨 HOTEL MANAGEMENT BACKEND - PRODUCTION SERVER 🏨      ║');
+  console.log('╚════════════════════════════════════════════════════════════╝');
+  console.log('');
+  console.log(`  ✓ Server Status:     RUNNING`);
+  console.log(`  ✓ Port:              ${PORT}`);
+  console.log(`  ✓ Host:              ${HOST} (all interfaces)`);
+  console.log(`  ✓ Environment:       ${process.env.NODE_ENV || 'development'}`);
+  console.log(`  ✓ MongoDB:           ${mongodbConnected ? 'CONNECTED' : 'CONNECTING...'}`);
+  console.log('');
+  console.log('  📡 API ENDPOINTS:');
+  console.log(`     - Health:        http://18.215.168.203:${PORT}/api/health`);
+  console.log(`     - Register:      http://18.215.168.203:${PORT}/api/auth/register`);
+  console.log(`     - Login:         http://18.215.168.203:${PORT}/api/auth/login`);
+  console.log('');
+  console.log('  🌐 FRONTEND:');
+  console.log(`     - S3 Bucket:     http://hotel-frontend-krishna.s3-website-us-east-1.amazonaws.com`);
+  console.log(`     - API Base URL:  http://18.215.168.203:${PORT}/api`);
+  console.log('');
+  console.log('  ✓ Ready to accept connections from S3 frontend!');
+  console.log('════════════════════════════════════════════════════════════');
   console.log('');
 });
 
