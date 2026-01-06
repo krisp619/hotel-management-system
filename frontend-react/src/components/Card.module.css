@@ -1,0 +1,38 @@
+/**
+ * Card Component Styles
+ */
+
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+
+.header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: #333;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.content {
+  padding: 1.5rem;
+}

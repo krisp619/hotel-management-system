@@ -2,59 +2,104 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../api';
 import { useAuth } from '../hooks/useAuth';
+import { Input } from '../components/Input';
+import { Button } from '../components/Button';
+import { Alert } from '../components/Alert';
+import { Card } from '../components/Card';
 import styles from './Register.module.css';
 
 export const Register = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  // Validation
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'Full name is required';
+    } else if (formData.name.length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    return newErrors;
+  };
+
+  const handleChange = (field) => (e) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+    // Clear error for this field when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: '',
+      }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-
-    // Client-side validation
-    if (!name || !email || !password || !confirmPassword) {
-      setError('All fields are required');
+    setApiError('');
+    setSuccess('');
+    
+    // Validate
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
+    
+    setErrors({});
     setLoading(true);
 
     try {
       // Only send name, email, password (NOT confirmPassword)
-      const payload = { name, email, password };
-      console.log('Register request payload:', payload);
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      };
 
       const response = await authAPI.register(payload);
-      console.log('Registration successful:', response.data);
-
+      setSuccess('✓ Account created successfully! Redirecting...');
+      
       login(response.data.token, response.data.user);
-      navigate('/');
+      
+      // Redirect after short delay to show success message
+      setTimeout(() => navigate('/'), 1000);
     } catch (err) {
-      const errorMsg = err.response?.data?.error || err.message || 'Registration failed';
-      console.error('Registration error:', {
-        status: err.response?.status,
-        data: err.response?.data,
-        message: err.message,
-        fullError: err
-      });
-      setError(errorMsg);
+      const errorMsg = err.response?.data?.error || err.message || 'Registration failed. Please try again.';
+      setApiError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -63,67 +108,94 @@ export const Register = () => {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.mainContent}>
-        <div className={styles.formContainer}>
-          <h3>Create Account</h3>
-          <p className={styles.subtitle}>Register to book your rooms</p>
+        <Card
+          title="Create Account"
+          subtitle="Join us and start booking your rooms"
+          className={styles.formCard}
+        >
+          {success && (
+            <Alert 
+              message={success} 
+              type="success" 
+              icon="✓"
+              dismissible={false}
+            />
+          )}
           
-          {error && <div className={styles.error}>{error}</div>}
+          {apiError && (
+            <Alert 
+              message={apiError} 
+              type="error" 
+              icon="✕"
+              onClose={() => setApiError('')}
+              dismissible={true}
+            />
+          )}
           
-          <form onSubmit={handleSubmit}>
-            <div className={styles.formGroup}>
-              <label htmlFor="name">Full Name *</label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name"
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="email">Email Address *</label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="password">Password *</label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter a strong password"
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="confirmPassword">Confirm Password *</label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
-                required
-              />
-            </div>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <Input
+              label="Full Name"
+              type="text"
+              value={formData.name}
+              onChange={handleChange('name')}
+              placeholder="John Doe"
+              error={errors.name}
+              required
+              autoComplete="name"
+            />
             
-            <button type="submit" disabled={loading} className={styles.submitBtn}>
-              {loading ? 'Creating account...' : 'Register'}
-            </button>
+            <Input
+              label="Email Address"
+              type="email"
+              value={formData.email}
+              onChange={handleChange('email')}
+              placeholder="you@example.com"
+              error={errors.email}
+              required
+              autoComplete="email"
+            />
+            
+            <Input
+              label="Password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange('password')}
+              placeholder="Create a strong password"
+              error={errors.password}
+              required
+              autoComplete="new-password"
+            />
+            
+            <Input
+              label="Confirm Password"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={handleChange('confirmPassword')}
+              placeholder="Re-enter your password"
+              error={errors.confirmPassword}
+              required
+              autoComplete="new-password"
+            />
+            
+            <Button
+              type="submit"
+              fullWidth
+              loading={loading}
+              disabled={loading}
+            >
+              {loading ? 'Creating account...' : 'Create Account'}
+            </Button>
           </form>
           
-          <p className={styles.loginLink}>
-            Already have an account? <Link to="/login">Sign in here</Link>
+          <div className={styles.divider}></div>
+          
+          <p className={styles.footer}>
+            Already have an account?{' '}
+            <Link to="/login" className={styles.link}>
+              Sign in here
+            </Link>
           </p>
-        </div>
+        </Card>
       </div>
     </div>
   );
