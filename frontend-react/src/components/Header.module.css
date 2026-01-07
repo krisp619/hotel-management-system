@@ -1,191 +1,220 @@
+/* Premium Navigation Header - Travel Industry */
+
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 1rem 0;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   position: sticky;
   top: 0;
   z-index: 100;
-  flex-shrink: 0;
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
+  padding: 0 var(--spacing-6);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
-  gap: 2rem;
+  justify-content: space-between;
+  height: 64px;
 }
 
+/* Logo */
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-2);
   text-decoration: none;
-  color: white;
-  font-size: 1.3rem;
-  font-weight: 700;
-  transition: all 0.3s ease;
-  letter-spacing: -0.5px;
+  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+  color: var(--color-primary-600);
+  transition: color var(--transition-base);
 }
 
 .logo:hover {
-  transform: scale(1.05);
-  opacity: 0.9;
+  color: var(--color-primary-700);
 }
 
 .logoIcon {
-  font-size: 1.8rem;
+  font-size: 1.75rem;
 }
 
 .logoText {
-  background: linear-gradient(90deg, #ffffff 0%, #f0f0f0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: var(--font-display);
 }
 
+/* Navigation */
 .nav {
   display: flex;
-  gap: 1.5rem;
+  gap: var(--spacing-6);
   align-items: center;
-  flex-wrap: wrap;
+  flex: 1;
+  margin: 0 var(--spacing-8);
+  justify-content: center;
 }
 
 .navLink {
-  color: white;
+  color: var(--color-neutral-700);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-base);
   text-decoration: none;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  font-size: 0.95rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
+  transition: color var(--transition-base);
   position: relative;
 }
 
 .navLink::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -4px;
   left: 0;
   width: 0;
   height: 2px;
-  background: white;
-  transition: width 0.3s ease;
+  background: var(--color-primary-600);
+  transition: width var(--transition-base);
 }
 
 .navLink:hover {
-  opacity: 0.9;
+  color: var(--color-primary-600);
 }
 
 .navLink:hover::after {
   width: 100%;
 }
 
-.userSection {
+/* Auth Buttons */
+.authButtons {
   display: flex;
+  gap: var(--spacing-3);
   align-items: center;
-  gap: 1rem;
-  padding-left: 1rem;
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
 }
 
-.userName {
-  font-size: 0.9rem;
-  font-weight: 500;
+.btnLogin {
+  color: var(--color-neutral-700);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: var(--transition-button);
+  font-size: 15px;
   white-space: nowrap;
+  will-change: color, background;
 }
 
-.logoutBtn {
-  background: rgba(255, 255, 255, 0.15) !important;
-  color: white !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  padding: 0.5rem 1rem !important;
+.btnLogin:hover {
+  color: var(--color-primary-600);
+  background: var(--color-primary-50);
 }
 
-.logoutBtn:hover {
-  background: rgba(255, 255, 255, 0.25) !important;
+.btnSignup {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: var(--transition-button);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  font-size: 15px;
+  white-space: nowrap;
+  will-change: transform, box-shadow, background;
 }
 
-.signupBtn {
-  background: white !important;
-  color: #667eea !important;
-  font-weight: 600;
-  padding: 0.6rem 1.2rem !important;
-}
-
-.signupBtn:hover {
-  background: #f0f0f0 !important;
+.btnSignup:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
   transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
 }
 
-/* Responsive Design */
+.btnSignup:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+/* Mobile Menu Button */
+.mobileMenuBtn {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-2);
+  z-index: 101;
+}
+
+.mobileMenuBtn span {
+  width: 24px;
+  height: 3px;
+  background: var(--color-neutral-800);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
 @media (max-width: 768px) {
   .container {
-    padding: 0 15px;
-    gap: 1rem;
+    height: 56px;
+    padding: 0 var(--spacing-4);
+  }
+
+  .mobileMenuBtn {
+    display: flex;
   }
 
   .nav {
-    gap: 1rem;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: var(--spacing-4);
+    background: white;
+    padding: var(--spacing-4) var(--spacing-4);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(-100%);
+    transition: transform var(--transition-base);
+    margin: 0;
+    justify-content: flex-start;
+  }
+
+  .navOpen {
+    transform: translateX(0) !important;
   }
 
   .navLink {
-    font-size: 0.85rem;
-    padding: 0.4rem 0.5rem;
+    width: 100%;
+    padding: var(--spacing-3);
   }
 
-  .userSection {
-    border-left: none;
-    padding-left: 0;
-    gap: 0.5rem;
+  .logoText {
+    display: none;
   }
 
-  .userName {
-    font-size: 0.8rem;
-  }
-
-  .logoutBtn {
-    padding: 0.4rem 0.75rem !important;
-  }
-
-  .signupBtn {
-    padding: 0.5rem 1rem !important;
+  .authButtons {
+    flex-direction: column;
+    gap: var(--spacing-3);
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .container {
-    padding: 0 10px;
-    flex-direction: column;
-    gap: 1rem;
+    padding: 0 var(--spacing-3);
   }
 
   .logo {
-    width: 100%;
+    font-size: var(--text-base);
   }
 
-  .nav {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
+  .logoIcon {
+    font-size: 1.5rem;
   }
 
-  .navLink {
-    font-size: 0.8rem;
+  .btnSignup,
+  .btnLogin {
+    font-size: var(--text-sm);
+    padding: var(--spacing-2) var(--spacing-4);
   }
-
-  .userSection {
-    width: 100%;
-    justify-content: center;
-  }
-}
-  font-weight: 500;
-  transition: all 0.3s;
-}
-
-.logoutBtn:hover {
-  background: rgba(255, 255, 255, 0.3);
 }

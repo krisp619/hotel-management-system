@@ -1,123 +1,1018 @@
-.pageContainer {
+/* ============================================
+   PREMIUM TRAVEL INDUSTRY LOGIN - DESIGN 2026
+   ============================================ */
+
+/* Root Container */
+.loginContainer {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+/* ============================================
+   LEFT SIDE - HERO SECTION (Premium)
+   ============================================ */
+
+.brandingSection {
+  width: 50%;
+  background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #ea580c 100%);
+  color: white;
+  padding: 60px 40px;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-}
-
-.mainContent {
-  flex: 1;
-  display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem 1rem;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Decorative background elements */
+.brandingSection::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite;
+}
+
+.brandingSection::after {
+  content: '';
+  position: absolute;
+  bottom: 10%;
+  left: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 10s ease-in-out infinite reverse;
+}
+
+/* Content wrapper */
+.brandContent {
+  position: relative;
+  z-index: 2;
+  max-width: 380px;
+  text-align: center;
+}
+
+/* Main title */
+.brandTitle {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+  animation: slideInDown 0.7s ease-out;
+}
+
+/* Subtitle */
+.brandSubtitle {
+  font-size: 18px;
+  font-weight: 300;
+  opacity: 0.95;
+  margin-bottom: 48px;
+  line-height: 1.6;
+  letter-spacing: 0.2px;
+  animation: slideInDown 0.7s ease-out 0.1s both;
+}
+
+/* Features Section - Card-based layout */
+.features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 48px;
+  text-align: left;
+}
+
+.feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  animation: slideInLeft 0.6s ease-out forwards;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.feature:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.feature:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.feature:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.feature:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.feature:nth-child(4) {
+  animation-delay: 0.5s;
+}
+
+/* Feature Icon */
+.featureIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  font-size: 20px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.feature span:last-child {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+  opacity: 0.95;
+}
+
+/* Testimonial Card */
+.testimonial {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 24px;
+  border-radius: 14px;
+  border-left: 4px solid rgba(234, 88, 12, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  animation: slideInUp 0.7s ease-out 0.6s both;
+}
+
+.testimonialText {
+  font-size: 15px;
+  margin-bottom: 12px;
+  font-style: italic;
+  line-height: 1.6;
+  color: white;
+  opacity: 0.98;
+  font-weight: 300;
+}
+
+.testimonialAuthor {
+  font-size: 13px;
+  opacity: 0.8;
+  color: white;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ============================================
+   RIGHT SIDE - FORM SECTION (Elevated)
+   ============================================ */
+
+.formSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 40px;
+  background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
+}
+
+/* Form Card - Premium Elevated Design */
 .formCard {
   width: 100%;
-  max-width: 450px;
+  max-width: 440px;
+  background: white;
+  border-radius: 18px;
+  padding: 48px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.08);
+  position: relative;
+  animation: slideInUp 0.6s ease-out;
 }
 
-.form {
-  margin-bottom: 1rem;
+/* Top accent border */
+.formCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6 0%, #7c3aed 50%, #ea580c 100%);
+  border-radius: 18px 18px 0 0;
 }
 
-.forgotPassword {
-  text-align: right;
-  margin-bottom: 1.5rem;
-}
-
-.forgotPassword a {
-  color: #667eea;
-  text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.forgotPassword a:hover {
-  color: #764ba2;
-  text-decoration: underline;
-}
-
-.divider {
-  height: 1px;
-  background: #f0f0f0;
-  margin: 1.5rem 0;
-}
-
-.footer {
+/* Form Title */
+.formTitle {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
   text-align: center;
-  color: #666;
-  font-size: 0.9rem;
-  margin: 0;
+  letter-spacing: -0.3px;
 }
 
-.link {
-  color: #667eea;
+/* Form Subtitle */
+.formSubtitle {
+  font-size: 14px;
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 28px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Error Alert - Improved */
+.errorAlert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.06) 0%, rgba(220, 38, 38, 0.02) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 10px;
+  color: #991b1b;
+  margin-bottom: 24px;
+  font-weight: 500;
+  font-size: 14px;
+  animation: slideInDown 0.3s ease-out;
+  line-height: 1.5;
+}
+
+.errorIcon {
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ============================================
+   FORM ELEMENTS - PREMIUM STYLING
+   ============================================ */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Form Group */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Labels - Clean & Professional */
+.label {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Input Wrapper */
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Inputs - Minimal but Elegant */
+.input {
+  width: 100%;
+  padding: 16px 18px;
+  padding-right: 40px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-family: var(--font-body);
+  background-color: #f8fafc;
+  color: #1e293b;
+  transition: all 0.3s ease;
+}
+
+.input::placeholder {
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+/* Focus state - Animated bottom border effect */
+.input:focus {
+  outline: none;
+  background-color: white;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.12);
+}
+
+/* Input Error State */
+.input.inputError {
+  border-color: #fca5a5;
+  background-color: rgba(239, 68, 68, 0.03);
+}
+
+.input.inputError:focus {
+  background-color: white;
+  box-shadow: 0 0 0 5px rgba(239, 68, 68, 0.1);
+}
+
+/* Input Success State */
+.input.inputSuccess {
+  border-color: #22c55e;
+  background-color: rgba(34, 197, 94, 0.04);
+}
+
+.input.inputSuccess:focus {
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.08);
+}
+
+/* Validation Icon */
+.validationIcon {
+  position: absolute;
+  right: 14px;
+  color: #22c55e;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Toggle Password Button */
+.toggleButton {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  user-select: none;
+}
+
+.toggleButton:hover {
+  transform: scale(1.15);
+}
+
+.toggleButton:active {
+  transform: scale(0.95);
+}
+
+/* Error Text */
+.errorText {
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 500;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================================
+   BOTTOM LINKS & BUTTONS
+   ============================================ */
+
+/* Remember & Forgot Password */
+.bottomLinks {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.rememberLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.rememberLabel:hover {
+  color: #1e293b;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Forgot Password Link */
+.forgotLink {
+  color: #3b82f6;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.2s ease;
+  position: relative;
 }
 
-.link:hover {
-  color: #764ba2;
-  text-decoration: underline;
+.forgotLink::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #3b82f6;
+  transition: width 0.3s ease;
 }
 
-/* Responsive Design */
+.forgotLink:hover {
+  color: #1d4ed8;
+}
+
+.forgotLink:hover::after {
+  width: 100%;
+}
+
+/* ============================================
+   SUBMIT BUTTON - PREMIUM GRADIENT
+   ============================================ */
+
+.submitButton {
+  width: 100%;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  font-family: var(--font-body);
+  letter-spacing: 0.4px;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.submitButton:disabled {
+  background: linear-gradient(135deg, #cbd5e1 0%, #a1a5b0 100%);
+  cursor: not-allowed;
+  opacity: 0.8;
+  box-shadow: 0 2px 8px rgba(203, 213, 225, 0.3);
+}
+
+/* Spinner Animation */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ============================================
+   SOCIAL LOGIN & DIVIDER
+   ============================================ */
+
+/* Divider */
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 24px 0;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 46%;
+  height: 1px;
+  background-color: #e2e8f0;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.divider span {
+  position: relative;
+  background-color: white;
+  padding: 0 12px;
+  z-index: 1;
+  display: inline-block;
+}
+
+/* Social Login Buttons */
+.socialButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.socialBtn {
+  padding: 12px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: white;
+  color: #1e293b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+.socialBtn:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+  transform: translateY(-1px);
+}
+
+.socialBtn span {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* ============================================
+   SIGNUP LINK
+   ============================================ */
+
+.signupText {
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.signupLink {
+  color: #3b82f6;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.signupLink::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+.signupLink:hover {
+  color: #1d4ed8;
+}
+
+.signupLink:hover::after {
+  width: 100%;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(20px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - TABLET (768px)
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .brandingSection {
+    padding: 50px 30px;
+  }
+
+  .formSection {
+    padding: 50px 30px;
+  }
+
+  .formCard {
+    max-width: 400px;
+    padding: 40px;
+  }
+
+  .brandTitle {
+    font-size: 36px;
+  }
+
+  .brandSubtitle {
+    margin-bottom: 40px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - TABLET & BELOW (768px)
+   ============================================ */
+
 @media (max-width: 768px) {
-  .mainContent {
-    padding: 1.5rem 1rem;
+  .loginContainer {
+    flex-direction: column;
+  }
+
+  .brandingSection {
+    width: 100%;
+    min-height: 40vh;
+    padding: 40px 24px;
+    justify-content: flex-start;
+    padding-top: 60px;
+  }
+
+  .brandContent {
+    max-width: 100%;
+  }
+
+  .brandTitle {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .brandSubtitle {
+    font-size: 15px;
+    margin-bottom: 32px;
+  }
+
+  .features {
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .feature {
+    padding: 12px;
+  }
+
+  .featureIcon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .testimonial {
+    padding: 16px;
+  }
+
+  .testimonialText {
+    font-size: 14px;
+  }
+
+  .formSection {
+    width: 100%;
+    min-height: 60vh;
+    padding: 32px 20px;
   }
 
   .formCard {
     max-width: 100%;
+    padding: 32px;
+  }
+
+  .formTitle {
+    font-size: 24px;
+  }
+
+  .formSubtitle {
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+
+  .input {
+    font-size: 16px; /* Prevents iOS auto-zoom */
+    padding: 12px 14px;
+  }
+
+  .submitButton {
+    min-height: 48px;
+    padding: 14px 16px;
+  }
+
+  .socialButtons {
+    grid-template-columns: 1fr;
+  }
+
+  .socialBtn {
+    min-height: 44px;
   }
 }
 
-@media (max-width: 480px) {
-  .mainContent {
-    padding: 1rem;
+/* ============================================
+   RESPONSIVE DESIGN - MOBILE (640px & below)
+   ============================================ */
+
+@media (max-width: 640px) {
+  .loginContainer {
+    flex-direction: column;
+  }
+
+  .brandingSection {
+    width: 100%;
+    min-height: 35vh;
+    padding: 36px 16px;
+  }
+
+  .brandTitle {
+    font-size: 24px;
+  }
+
+  .brandSubtitle {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .features {
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .feature {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .featureIcon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    margin-right: 4px;
+  }
+
+  .testimonial {
+    padding: 12px;
+    margin-top: 16px;
+  }
+
+  .testimonialText {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .testimonialAuthor {
+    font-size: 12px;
+  }
+
+  .formSection {
+    padding: 24px 16px;
+  }
+
+  .formCard {
+    padding: 24px;
+    border-radius: 16px;
+  }
+
+  .formTitle {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+
+  .formSubtitle {
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+
+  form {
+    gap: 20px;
+  }
+
+  .label {
+    font-size: 12px;
+  }
+
+  .input {
+    padding: 12px 12px;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+
+  .toggleButton {
+    right: 8px;
+  }
+
+  .submitButton {
+    min-height: 46px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .divider {
+    margin: 20px 0;
+    font-size: 12px;
+  }
+
+  .socialButtons {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .socialBtn {
+    font-size: 12px;
+    min-height: 42px;
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+
+  .signupText {
+    font-size: 12px;
+  }
+
+  .bottomLinks {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .rememberLabel {
+    font-size: 12px;
+  }
+
+  .forgotLink {
+    font-size: 12px;
   }
 }
-  margin-bottom: 1.5rem;
-}
 
-.submitBtn:hover:not(:disabled) {
-  background: #0d7a0d;
-  box-shadow: 0 2px 10px rgba(13, 122, 13, 0.2);
-}
+/* ============================================
+   DARK MODE SUPPORT (Optional)
+   ============================================ */
 
-.submitBtn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
+@media (prefers-color-scheme: dark) {
+  .loginContainer {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
 
-.registerLink {
-  text-align: center;
-  color: #666;
-  font-size: 0.9rem;
-  margin: 0;
-}
+  .formSection {
+    background: linear-gradient(to bottom, #0f172a 0%, #1a2942 100%);
+  }
 
-.registerLink a {
-  color: #0099cc;
-  text-decoration: none;
-  font-weight: 600;
-}
+  .formCard {
+    background: #1e293b;
+    border-color: rgba(59, 130, 246, 0.1);
+  }
 
-.registerLink a:hover {
-  text-decoration: underline;
-}
+  .formTitle {
+    color: white;
+  }
 
-.error {
-  background: #fef3f3;
-  color: #d32f2f;
-  padding: 0.9rem;
-  border-radius: 4px;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-weight: 500;
-  border-left: 4px solid #d32f2f;
+  .formSubtitle {
+    color: #cbd5e1;
+  }
+
+  .label {
+    color: #e2e8f0;
+  }
+
+  .input {
+    background-color: #0f172a;
+    color: white;
+    border-color: #334155;
+  }
+
+  .input::placeholder {
+    color: #64748b;
+  }
+
+  .input:focus {
+    background-color: #1e293b;
+    border-color: #3b82f6;
+  }
+
+  .rememberLabel {
+    color: #cbd5e1;
+  }
+
+  .signupText {
+    color: #94a3b8;
+  }
+
+  .divider {
+    color: #64748b;
+  }
+
+  .divider::before,
+  .divider::after {
+    background-color: #334155;
+  }
+
+  .socialBtn {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .socialBtn:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+    color: #3b82f6;
+  }
+
+  .errorAlert {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.08) 100%);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+  }
 }

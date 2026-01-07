@@ -12,20 +12,49 @@ let mongodbConnected = false;
 // MIDDLEWARE
 // ============================================
 
-// CORS Configuration - API Only, S3 Frontend Safe
+// CORS Configuration - Production Ready
+const getAllowedOrigins = () => {
+  const defaultOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:5000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+    'http://127.0.0.1:5000',
+  ];
+
+  // Add S3 domains
+  const s3Origins = [
+    'http://hotel-frontend-krishna.s3-website-us-east-1.amazonaws.com',
+    'https://hotel-frontend-krishna.s3-website-us-east-1.amazonaws.com',
+  ];
+
+  // Parse CORS_ORIGIN from .env (comma-separated)
+  const envOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map(url => url.trim()).filter(Boolean)
+    : [];
+
+  // Combine all origins (remove duplicates)
+  const allOrigins = [...new Set([...defaultOrigins, ...s3Origins, ...envOrigins])];
+  
+  console.log('✓ CORS Origins Allowed:', allOrigins);
+  return allOrigins;
+};
+
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN 
-    ? process.env.CORS_ORIGIN.split(',').map(url => url.trim())
-    : [
-        'http://localhost:3001',
-        'http://localhost:3000',
-        'http://hotel-management-frontend.s3-website-us-east-1.amazonaws.com',
-        'https://hotel-management-frontend.s3-website-us-east-1.amazonaws.com',
-      ],
+  origin: getAllowedOrigins(),
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true,
   optionsSuccessStatus: 200,
+  maxAge: 86400, // 24 hours
 };
+
+// Apply CORS middleware
 app.use(cors(corsOptions));
+
+// Explicit OPTIONS handler for preflight requests
+app.options('*', cors(corsOptions));
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -108,6 +137,10 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: true, 
     select: false 
+  },
+  phone: {
+    type: String,
+    trim: true,
   },
   createdAt: { 
     type: Date, 
@@ -243,25 +276,42 @@ app.get('/api/health', (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { fullName, email, password, phone } = req.body;
     
     // Validate required fields
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: 'Missing required fields: name, email, password' });
+    if (!fullName || !email || !password || !phone) {
+      return res.status(400).json({ message: 'Missing required fields: fullName, email, password, phone' });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    if (password.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters' });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+
+    // Validate phone format (10 digits)
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone.replace(/[^\d]/g, ''))) {
+      return res.status(400).json({ message: 'Phone number must be 10 digits' });
     }
     
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: 'Email already registered' });
+      return res.status(409).json({ message: 'Email already registered' });
     }
     
     // Create new user
-    const user = new User({ name, email, password });
+    const user = new User({ 
+      name: fullName,
+      email, 
+      password,
+      phone 
+    });
     await user.save();
     
     // Generate JWT token
@@ -274,11 +324,11 @@ app.post('/api/auth/register', async (req, res) => {
     res.status(201).json({ 
       message: 'Registration successful',
       token, 
-      user: { id: user._id, name, email } 
+      user: { id: user._id, name: fullName, email, phone } 
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: 'Registration failed. Please try again.' });
+    res.status(500).json({ message: 'Registration failed. Please try again.' });
   }
 });
 

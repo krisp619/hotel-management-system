@@ -1,0 +1,386 @@
+# Quick Reference - Frontend Improvements
+
+## Color Palette
+
+```css
+/* Primary - Trust Blue */
+--color-primary: #0284c7
+--color-primary-light: #7dd3fc
+--color-primary-dark: #0369a1
+
+/* Secondary - Action Orange */
+--color-secondary: #ea580c
+--color-secondary-light: #fdba74
+--color-secondary-dark: #c2410c
+
+/* Accent - Success Green */
+--color-accent: #16a34a
+--color-accent-light: #bbf7d0
+--color-accent-dark: #15803d
+
+/* Error - Warning Red */
+--color-error: #dc2626
+--color-error-light: #fecaca
+--color-error-dark: #991b1b
+
+/* Neutral - Grays */
+--color-gray-50: #f9fafb   (background)
+--color-gray-100: #f3f4f6  (surface)
+--color-gray-200: #e5e7eb  (border)
+--color-gray-400: #9ca3af  (secondary text)
+--color-gray-700: #374151  (text)
+--color-gray-900: #111827  (dark text)
+```
+
+## Typography
+
+```css
+/* Font Families */
+font-family: 'Poppins', sans-serif;        /* Headings */
+font-family: 'Inter', sans-serif;          /* Body text */
+font-family: 'JetBrains Mono', monospace;  /* Code */
+
+/* Font Sizes */
+h1: 3rem    (48px)
+h2: 2.25rem (36px)
+h3: 1.875rem (30px)
+h4: 1.25rem  (20px)
+p:  1rem     (16px)
+sm: 0.875rem (14px)
+xs: 0.75rem  (12px)
+
+/* Font Weights */
+light: 300
+normal: 400
+medium: 500
+semibold: 600
+bold: 700
+extrabold: 800
+```
+
+## Spacing (8px Base)
+
+```css
+--space-1: 4px
+--space-2: 8px
+--space-3: 12px
+--space-4: 16px
+--space-6: 24px
+--space-8: 32px
+--space-12: 48px
+--space-16: 64px
+```
+
+## Components
+
+### Button
+```jsx
+<button className="btn btn-primary">Click me</button>
+<button className="btn btn-secondary btn-lg">Large</button>
+<button className="btn btn-outline btn-sm">Small</button>
+<button className="btn btn-text">Text Button</button>
+```
+
+### Input
+```jsx
+<input className="input" type="text" placeholder="..." />
+<input className="input input-error" value="" />
+<input className="input input-success" value="" />
+```
+
+### Card
+```jsx
+<div className="card card-elevated">
+  <div className="card-header">Title</div>
+  <div className="card-body">Content</div>
+  <div className="card-footer">Actions</div>
+</div>
+
+<div className="card card-outlined">...</div>
+<div className="card card-flat">...</div>
+```
+
+### Form
+```jsx
+<div className="form-group">
+  <label>Email</label>
+  <input className="input" type="email" />
+  <span className="form-error">Error message</span>
+  <span className="form-success">Success message</span>
+  <span className="form-help">Help text</span>
+</div>
+```
+
+## Responsive Classes
+
+```css
+/* Mobile: 320px - 639px (default) */
+/* Tablet: 640px - 1023px */
+@media (min-width: 640px) { ... }
+
+/* Desktop: 1024px - 1279px */
+@media (min-width: 1024px) { ... }
+
+/* Large: 1280px+ */
+@media (min-width: 1280px) { ... }
+```
+
+## Animations
+
+```css
+/* Predefined keyframes */
+@keyframes fadeIn { /* fade */ }
+@keyframes slideInUp { /* slide from bottom */ }
+@keyframes slideInDown { /* slide from top */ }
+@keyframes slideInLeft { /* slide from left */ }
+@keyframes slideInRight { /* slide from right */ }
+@keyframes scaleIn { /* zoom in */ }
+@keyframes spin { /* rotate */ }
+@keyframes pulse { /* blink */ }
+
+/* Usage */
+.animate-fade-in { animation: fadeIn 250ms ease-in-out; }
+.animate-slide-up { animation: slideInUp 250ms ease-in-out; }
+.animate-spin { animation: spin 1s linear infinite; }
+```
+
+## Shadows
+
+```css
+/* Elevation Levels */
+--shadow-elevation-1: 0 1px 3px rgba(0,0,0,0.08)
+--shadow-elevation-2: 0 3px 8px rgba(0,0,0,0.12)
+--shadow-elevation-3: 0 8px 16px rgba(0,0,0,0.16)
+--shadow-elevation-4: 0 12px 24px rgba(0,0,0,0.20)
+--shadow-elevation-5: 0 16px 32px rgba(0,0,0,0.24)
+```
+
+## Border Radius
+
+```css
+--radius-xs: 4px
+--radius-sm: 6px
+--radius-base: 8px
+--radius-md: 12px
+--radius-lg: 16px
+--radius-xl: 24px
+--radius-2xl: 32px
+--radius-full: 9999px (circle)
+```
+
+## Transitions
+
+```css
+--transition-fast: 150ms ease-in-out
+--transition-base: 250ms ease-in-out
+--transition-slow: 350ms ease-in-out
+```
+
+## Login Page
+
+**Location:** `src/pages/Login.jsx`
+
+**Features:**
+- Split-screen layout (50/50)
+- Left: Brand with features
+- Right: Email/password form
+- Real-time validation
+- Social login buttons
+- Mobile responsive
+
+**Key Features:**
+```jsx
+<div className="loginContainer">
+  <div className="brandingSection">...</div>
+  <div className="formSection">
+    <form onSubmit={handleSubmit}>
+      <input className="input" type="email" />
+      <input className="input" type="password" />
+      <button className="submitButton">Sign In</button>
+    </form>
+  </div>
+</div>
+```
+
+## Register Page
+
+**Location:** `src/pages/Register.jsx`
+
+**Features:**
+- Multi-step form (2 steps)
+- Progress bar
+- Password strength meter
+- Real-time validation
+- Terms & conditions
+- Mobile responsive
+
+**Key Features:**
+```jsx
+<div className="registerContainer">
+  <div className="brandingSection">...</div>
+  <div className="formSection">
+    <div className="progressBar">...</div>
+    {step === 1 ? <EmailStep /> : <DetailsStep />}
+  </div>
+</div>
+```
+
+## Design System Usage
+
+```javascript
+// Import design tokens
+import designSystem from '@/styles/designSystem.js'
+
+// Use in components
+const { colors, typography, spacing, shadows } = designSystem
+
+// Access colors
+const primaryColor = colors.primary[600]
+const errorColor = colors.error[500]
+
+// Use in styles
+const styles = {
+  header: {
+    backgroundColor: colors.primary[600],
+    padding: spacing[8],
+    fontFamily: typography.fonts.display,
+    fontSize: typography.sizes['2xl'],
+  }
+}
+```
+
+## CSS Variables Usage
+
+```css
+/* In your CSS files */
+.button {
+  background-color: var(--color-primary);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-elevation-1);
+}
+
+.button:hover {
+  background-color: var(--color-primary-700);
+  box-shadow: var(--shadow-elevation-3);
+}
+```
+
+## Accessibility
+
+```jsx
+// Semantic HTML
+<button aria-label="Close menu">✕</button>
+<input aria-label="Email address" />
+
+// Focus states
+input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+// Color contrast (WCAG AA)
+// Text on color-primary: white
+// Color-primary: #0284c7 on white: 6.5:1
+
+// Keyboard navigation
+// Tab, Enter, Esc fully supported
+// Arrow keys for menus/selects
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; }
+}
+```
+
+## Performance Tips
+
+1. **Images**
+   - Use WebP with JPEG fallback
+   - Lazy load with loading="lazy"
+   - Compress before upload
+   - Use responsive images
+
+2. **Code**
+   - Lazy load pages with React.lazy()
+   - Debounce search input (300ms)
+   - Cancel requests on unmount
+   - Use React.memo for pure components
+
+3. **Assets**
+   - Minify CSS/JS
+   - Remove unused CSS
+   - Compress fonts
+   - Use CDN for static files
+
+4. **Bundle**
+   - Tree shake unused code
+   - Split code by route
+   - Cache busting with hashes
+   - Gzip compression
+
+## Common Issues & Solutions
+
+**Issue: Styles not applying**
+→ Check CSS module import syntax: `import styles from './Component.module.css'`
+→ Use: `className={styles.className}`
+
+**Issue: Colors look different**
+→ CSS variables defined in: `src/styles/globals.css`
+→ Import fonts in: `index.html` or `main.jsx`
+
+**Issue: Mobile layout broken**
+→ Use: `@media (min-width: 640px)` for tablet+
+→ Default (no media query) = mobile styles
+
+**Issue: Form validation not working**
+→ Check input `required` attribute
+→ Verify regex patterns
+→ Test onChange handler
+
+**Issue: Animations jumpy**
+→ Use `animation-timing-function: ease-in-out`
+→ Avoid micro animations on low-end devices
+→ Test with devtools throttling
+
+## File Locations
+
+```
+src/styles/
+├── globals.css        ← Global styles & tokens
+├── designSystem.js    ← Design tokens (JS)
+
+src/pages/
+├── Login.jsx          ← Modern login page
+├── Login.module.css   ← Login styles
+├── Register.jsx       ← Modern register page
+└── Register.module.css ← Register styles
+
+Documentation/
+├── FRONTEND_ARCHITECTURE_GUIDE.txt
+├── FRONTEND_REDESIGN_COMPLETE.txt
+└── QUICK_REFERENCE.txt (this file)
+```
+
+## Next Steps
+
+1. Review design system files
+2. Test Login & Register pages
+3. Apply design tokens to other components
+4. Build out remaining pages
+5. Test responsiveness
+6. Deploy to production
+
+---
+
+**Ready to build!** 🚀
+
+For detailed information, see:
+- `FRONTEND_REDESIGN_COMPLETE.txt` - Full summary
+- `FRONTEND_ARCHITECTURE_GUIDE.txt` - Architecture & structure
+- `src/styles/designSystem.js` - Design tokens
+- `src/styles/globals.css` - Global styles

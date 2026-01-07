@@ -11,6 +11,7 @@ export const Bookings = () => {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState(null);
   const [message, setMessage] = useState('');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchBookings();
@@ -18,10 +19,28 @@ export const Bookings = () => {
 
   const fetchBookings = async () => {
     try {
+      setError(null);
       const response = await bookingAPI.getBookings();
       setBookings(response.data.data || []);
+      
+      // Clear message after successful fetch
+      if (response.data.data && response.data.data.length === 0) {
+        setMessage('');
+      }
     } catch (err) {
-      setMessage('Failed to fetch bookings');
+      console.error('Fetch bookings error:', err);
+      
+      // Specific error messages based on error type
+      if (err.response?.status === 401) {
+        setError('Your session has expired. Please log in again.');
+      } else if (err.response?.status === 403) {
+        setError('You do not have permission to view bookings.');
+      } else if (err.message === 'Network Error' || !err.response) {
+        setError('Unable to fetch bookings. Please check your connection.');
+      } else {
+        setError('Failed to load bookings. Please try again.');
+      }
+      setBookings([]);
     } finally {
       setLoading(false);
     }
@@ -66,6 +85,13 @@ export const Bookings = () => {
   return (
     <div className={styles.container}>
       <h2>My Bookings</h2>
+      
+      {error && (
+        <div className={`${styles.message} ${styles.error}`}>
+          {error}
+        </div>
+      )}
+      
       {message && (
         <div
           className={`${styles.message} ${
@@ -76,9 +102,9 @@ export const Bookings = () => {
         </div>
       )}
 
-      {bookings.length === 0 ? (
+      {bookings.length === 0 && !error ? (
         <p className={styles.noBookings}>No bookings yet. Start booking now!</p>
-      ) : (
+      ) : !error ? (
         <div className={styles.bookingsList}>
           {bookings.map((booking) => (
             <div key={booking._id} className={styles.bookingCard}>
@@ -166,7 +192,7 @@ export const Bookings = () => {
             </div>
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   );
 };

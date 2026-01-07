@@ -1,0 +1,887 @@
+/* Home Page - Premium Travel Industry Design */
+
+.home {
+  width: 100%;
+}
+
+/* ========================================
+   HERO SECTION
+   ======================================== */
+
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 680px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 20%, #3b82f6 35%, #6366f1 60%, #d97706 85%, #ea580c 100%);
+  overflow: hidden;
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 64px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heroTitle {
+  color: white;
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 68px;
+  font-weight: 800;
+  line-height: 1.15;
+  animation: slideInDown 0.8s ease-out;
+  letter-spacing: -1px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  word-spacing: 0.05em;
+}
+
+.heroSubtitle {
+  color: rgba(255, 255, 255, 0.97);
+  text-align: center;
+  margin-bottom: 56px;
+  font-size: 20px;
+  font-weight: 500;
+  animation: slideInDown 0.9s ease-out 0.15s backwards;
+  line-height: 1.7;
+  max-width: 600px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.3px;
+}
+
+/* ========================================
+   SEARCH FORM
+   ======================================== */
+
+.searchForm {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr auto;
+  gap: 20px;
+  background: white;
+  padding: 36px 44px;
+  border-radius: 20px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(59, 130, 246, 0.1);
+  animation: slideInUp 0.9s ease-out 0.4s backwards;
+  border-top: 4px solid;
+  border-image: linear-gradient(90deg, #3b82f6, #1d4ed8) 1;
+}
+
+.searchFormGroup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.searchFormGroup label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.searchFormGroup input,
+.searchFormGroup select {
+  padding: 16px 18px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8fafc;
+  transition: all 0.3s ease;
+  color: #1e293b;
+}
+
+.searchFormGroup input:hover,
+.searchFormGroup select:hover {
+  border-color: #cbd5e1;
+  background-color: #f1f5f9;
+}
+
+.searchFormGroup input:focus,
+.searchFormGroup select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background-color: white;
+  box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.12), inset 0 1px 2px rgba(59, 130, 246, 0.05);
+}
+
+.searchFormGroup input::placeholder {
+  color: #94a3b8;
+}
+
+.icon {
+  position: absolute;
+  right: 16px;
+  top: 40px;
+  font-size: 1.25rem;
+  pointer-events: none;
+}
+
+.searchButton {
+  padding: 16px 36px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-button);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+  align-self: flex-end;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  will-change: transform, box-shadow, background;
+}
+
+.searchButton:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 35px rgba(59, 130, 246, 0.45);
+}
+
+.searchButton:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+}
+
+/* ========================================
+   RESPONSIVE SEARCH FORM
+   ======================================== */
+
+@media (max-width: 1024px) {
+  .hero {
+    min-height: 600px;
+  }
+
+  .heroTitle {
+    font-size: 56px;
+    line-height: 1.2;
+  }
+
+  .heroSubtitle {
+    font-size: 19px;
+    line-height: 1.65;
+  }
+
+  .searchForm {
+    grid-template-columns: 1fr 1fr;
+    padding: 28px 32px;
+    gap: 16px;
+  }
+
+  .searchButton {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    min-height: 520px;
+  }
+
+  .heroTitle {
+    font-size: 48px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    letter-spacing: -0.8px;
+  }
+
+  .heroSubtitle {
+    font-size: 18px;
+    line-height: 1.65;
+    margin-bottom: 40px;
+  }
+
+  .heroContent {
+    padding: 56px 24px;
+  }
+
+  .searchForm {
+    grid-template-columns: 1fr;
+    padding: 24px 24px;
+    gap: 14px;
+    margin: 0 16px;
+  }
+
+  .searchFormGroup label {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .searchFormGroup input,
+  .searchFormGroup select {
+    padding: 14px 16px;
+    font-size: 15px;
+  }
+
+  .icon {
+    top: 40px;
+  }
+
+  .searchButton {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    min-height: 420px;
+  }
+
+  .heroTitle {
+    font-size: 36px;
+    line-height: 1.2;
+    letter-spacing: -0.7px;
+  }
+
+  .heroSubtitle {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+
+  .heroContent {
+    padding: 48px 16px;
+  }
+
+  .searchForm {
+    grid-template-columns: 1fr;
+    padding: 20px 16px;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .searchFormGroup label {
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .searchFormGroup input,
+  .searchFormGroup select {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .icon {
+    top: 38px;
+  }
+
+  .searchButton {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+}
+
+/* ========================================
+   TRUST SECTION
+   ======================================== */
+
+.trustSection {
+  padding: 80px 32px;
+  background: linear-gradient(180deg, white 0%, #f8fafc 100%);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.trustGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+}
+
+.trustCard {
+  text-align: center;
+  padding: 40px 32px;
+  animation: slideInUp 0.7s ease-out;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+
+.trustCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.trustCard:hover::before {
+  opacity: 1;
+}
+
+.trustCard:hover {
+  transform: translateY(-8px);
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.12);
+}
+
+.trustIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: block;
+  animation: float 3s ease-in-out infinite;
+}
+
+.trustCard:nth-child(1) .trustIcon { animation-delay: 0s; }
+.trustCard:nth-child(2) .trustIcon { animation-delay: 0.2s; }
+.trustCard:nth-child(3) .trustIcon { animation-delay: 0.4s; }
+.trustCard:nth-child(4) .trustIcon { animation-delay: 0.6s; }
+
+.trustCard h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #1e293b;
+  letter-spacing: -0.3px;
+}
+
+.trustCard p {
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .trustSection {
+    padding: 48px 24px;
+  }
+
+  .trustGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+
+  .trustCard {
+    padding: 32px 24px;
+  }
+
+  .trustIcon {
+    font-size: 40px;
+    margin-bottom: 12px;
+  }
+
+  .trustCard h3 {
+    font-size: 18px;
+  }
+
+  .trustCard p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .trustGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .trustSection {
+    padding: 40px 16px;
+  }
+
+  .trustCard {
+    padding: 24px 20px;
+  }
+
+  .trustIcon {
+    font-size: 36px;
+  }
+}
+
+/* ========================================
+   FEATURED DESTINATIONS
+   ======================================== */
+
+.featuredSection {
+  padding: 80px 32px;
+  background: white;
+}
+
+.featuredSection h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 52px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -1px;
+}
+
+.featuredSection > div > ::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  margin: 16px auto 60px;
+  border-radius: 2px;
+}
+
+.destinationGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.destinationCard {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+  border: 1px solid #f1f5f9;
+}
+
+.destinationCard::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.destinationCard:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 24px 48px rgba(59, 130, 246, 0.15);
+  border-color: #e0e7ff;
+}
+
+.destinationCard:hover::after {
+  transform: scaleX(1);
+}
+
+.destImage {
+  width: 100%;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.destImage::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.destImage > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes shimmer {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(20px, 20px); }
+}
+
+.destinationCard h3 {
+  padding: 24px 20px 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.destinationCard p {
+  padding: 0 20px 24px;
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
+
+@media (max-width: 1024px) {
+  .destinationGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .featuredSection {
+    padding: 48px 24px;
+  }
+
+  .featuredSection h2 {
+    font-size: 40px;
+  }
+
+  .destinationGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .destImage {
+    height: 180px;
+    font-size: 48px;
+  }
+
+  .destinationCard h3 {
+    font-size: 18px;
+    padding: 20px 16px 6px;
+  }
+
+  .destinationCard p {
+    padding: 0 16px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 640px) {
+  .featuredSection {
+    padding: 40px 16px;
+  }
+
+  .featuredSection h2 {
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+
+  .destImage {
+    height: 160px;
+    font-size: 40px;
+  }
+}
+
+/* ========================================
+   DEALS SECTION
+   ======================================== */
+
+.dealsSection {
+  padding: 80px 32px;
+  background: linear-gradient(180deg, #f8fafc 0%, white 100%);
+}
+
+.dealsSection h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 52px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -1px;
+}
+
+.dealsSection > div > ::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  margin: 16px auto 60px;
+  border-radius: 2px;
+}
+
+.dealGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.dealCard {
+  background: white;
+  border: 2px solid;
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.dealCard::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.dealCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+}
+
+.dealCard:hover::before {
+  opacity: 1;
+}
+
+.dealCard:nth-child(1) {
+  border-color: #f97316;
+}
+
+.dealCard:nth-child(1):hover {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.05), rgba(249, 115, 22, 0.02));
+  border-color: #ea580c;
+}
+
+.dealCard:nth-child(2) {
+  border-color: #ea580c;
+}
+
+.dealCard:nth-child(2):hover {
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.05), rgba(234, 88, 12, 0.02));
+  border-color: #c2410c;
+}
+
+.dealCard:nth-child(3) {
+  border-color: #3b82f6;
+}
+
+.dealCard:nth-child(3):hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.02));
+  border-color: #1d4ed8;
+}
+
+.dealCard h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #1e293b;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -0.3px;
+}
+
+.dealCard p {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .dealsSection {
+    padding: 48px 24px;
+  }
+
+  .dealsSection h2 {
+    font-size: 40px;
+  }
+
+  .dealGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .dealCard {
+    padding: 32px 24px;
+  }
+
+  .dealCard h3 {
+    font-size: 20px;
+  }
+
+  .dealCard p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .dealsSection {
+    padding: 40px 16px;
+  }
+
+  .dealsSection h2 {
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+
+  .dealCard {
+    padding: 24px 20px;
+  }
+
+  .dealCard h3 {
+    font-size: 18px;
+  }
+}
+
+/* ========================================
+   CTA SECTION
+   ======================================== */
+
+.ctaSection {
+  padding: 100px 32px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.ctaSection::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: float 6s ease-in-out infinite;
+}
+
+.ctaSection h2 {
+  color: white;
+  margin-bottom: 16px;
+  font-size: 52px;
+  font-weight: 800;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -1px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.ctaSection p {
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 48px;
+  font-size: 20px;
+  position: relative;
+  z-index: 1;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ctaButton {
+  padding: 16px 48px;
+  background: white;
+  color: #3b82f6;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ctaButton:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  background: #f1f5f9;
+}
+
+.ctaButton:active {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(50px, 30px);
+  }
+}
+
+@media (max-width: 768px) {
+  .ctaSection {
+    padding: 64px 24px;
+  }
+
+  .ctaSection h2 {
+    font-size: 40px;
+    margin-bottom: 12px;
+  }
+
+  .ctaSection p {
+    font-size: 18px;
+    margin-bottom: 32px;
+  }
+
+  .ctaButton {
+    padding: 14px 36px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ctaSection {
+    padding: 40px 16px;
+  }
+
+  .ctaSection h2 {
+    font-size: 32px;
+  }
+
+  .ctaSection p {
+    font-size: 16px;
+  }
+
+  .ctaButton {
+    width: 100%;
+    padding: 12px 24px;
+  }
+}

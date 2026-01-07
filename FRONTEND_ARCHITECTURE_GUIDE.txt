@@ -1,0 +1,609 @@
+# Hotel Management Frontend - Complete Architecture Guide
+
+## Folder Structure (Recommended)
+
+```
+frontend-react/
+├── public/
+│   └── index.html
+│
+├── src/
+│   ├── assets/                      # Images, icons, videos
+│   │   ├── images/
+│   │   │   ├── hero/
+│   │   │   ├── hotels/
+│   │   │   └── placeholders/
+│   │   └── icons/
+│   │       ├── amenities/
+│   │       ├── ui/
+│   │       └── svg/
+│   │
+│   ├── components/                  # Reusable UI components
+│   │   ├── common/                  # Shared across app
+│   │   │   ├── Header/
+│   │   │   │   ├── Header.jsx
+│   │   │   │   └── Header.module.css
+│   │   │   ├── Footer/
+│   │   │   ├── Navigation/
+│   │   │   ├── Sidebar/
+│   │   │   └── Loader/
+│   │   │
+│   │   ├── shared/                  # UI primitives
+│   │   │   ├── Button/
+│   │   │   │   ├── Button.jsx
+│   │   │   │   └── Button.module.css
+│   │   │   ├── Input/
+│   │   │   ├── Card/
+│   │   │   ├── Modal/
+│   │   │   ├── Badge/
+│   │   │   ├── Toast/
+│   │   │   └── Spinner/
+│   │   │
+│   │   ├── search/                  # Search-related
+│   │   │   ├── SearchHero/
+│   │   │   ├── SearchBar/
+│   │   │   ├── FilterSidebar/
+│   │   │   └── SortOptions/
+│   │   │
+│   │   ├── hotels/                  # Hotel-specific
+│   │   │   ├── HotelCard/
+│   │   │   ├── HotelGallery/
+│   │   │   ├── HotelDetails/
+│   │   │   ├── RoomCard/
+│   │   │   ├── RoomGrid/
+│   │   │   ├── ReviewSection/
+│   │   │   └── AmenityList/
+│   │   │
+│   │   ├── booking/                 # Booking flow
+│   │   │   ├── BookingForm/
+│   │   │   ├── BookingModal/
+│   │   │   ├── RoomSelector/
+│   │   │   ├── GuestDetails/
+│   │   │   ├── PaymentForm/
+│   │   │   └── BookingSummary/
+│   │   │
+│   │   └── auth/                    # Auth-specific
+│   │       ├── ProtectedRoute/
+│   │       ├── LoginForm/
+│   │       └── RegisterForm/
+│   │
+│   ├── pages/                       # Page components
+│   │   ├── Home.jsx
+│   │   ├── HotelListing.jsx
+│   │   ├── HotelDetails.jsx
+│   │   ├── Checkout.jsx
+│   │   ├── Confirmation.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── Bookings.jsx
+│   │   ├── Profile.jsx
+│   │   ├── Settings.jsx
+│   │   │
+│   │   ├── Auth/
+│   │   │   ├── Login.jsx
+│   │   │   ├── Login.module.css
+│   │   │   ├── Register.jsx
+│   │   │   ├── Register.module.css
+│   │   │   └── ForgotPassword.jsx
+│   │   │
+│   │   ├── Admin/                   # Admin pages
+│   │   │   ├── AdminDashboard.jsx
+│   │   │   ├── HotelsAdmin.jsx
+│   │   │   ├── RoomsAdmin.jsx
+│   │   │   ├── BookingsAdmin.jsx
+│   │   │   └── UsersAdmin.jsx
+│   │   │
+│   │   └── Errors/
+│   │       ├── NotFound.jsx
+│   │       └── ServerError.jsx
+│   │
+│   ├── hooks/                       # Custom hooks
+│   │   ├── useAuth.js               # Authentication
+│   │   ├── useBooking.js            # Booking state
+│   │   ├── useFetch.js              # API calls
+│   │   ├── useForm.js               # Form handling
+│   │   ├── useDebounce.js           # Debouncing
+│   │   ├── useLocalStorage.js       # Local storage
+│   │   └── useWindowSize.js         # Responsive
+│   │
+│   ├── context/                     # Context API
+│   │   ├── AuthContext.js           # Auth state
+│   │   ├── BookingContext.js        # Booking state
+│   │   ├── FilterContext.js         # Search filters
+│   │   └── ThemeContext.js          # Theme state
+│   │
+│   ├── api/                         # API calls
+│   │   ├── index.js                 # Main Axios instance
+│   │   ├── auth.js                  # Auth endpoints
+│   │   ├── hotels.js                # Hotel endpoints
+│   │   ├── bookings.js              # Booking endpoints
+│   │   ├── interceptors.js          # Request/response
+│   │   └── config.js                # API config
+│   │
+│   ├── styles/                      # Global styles
+│   │   ├── globals.css              # Design tokens
+│   │   ├── designSystem.js          # Design tokens (JS)
+│   │   ├── variables.css            # CSS variables
+│   │   └── animations.css           # Keyframes
+│   │
+│   ├── utils/                       # Utility functions
+│   │   ├── formatters.js            # Format date, price, etc
+│   │   ├── validators.js            # Validation functions
+│   │   ├── constants.js             # App constants
+│   │   ├── helpers.js               # Helper functions
+│   │   └── localStorage.js          # Local storage helpers
+│   │
+│   ├── firebase/                    # Firebase config
+│   │   ├── config.js
+│   │   └── useFirebaseAuth.js       # Firebase hook
+│   │
+│   ├── config/                      # App config
+│   │   ├── navigation.js            # Routes config
+│   │   ├── theme.js                 # Theme config
+│   │   └── env.js                   # Environment config
+│   │
+│   ├── App.jsx                      # Root component
+│   ├── App.css                      # App-level styles
+│   ├── main.jsx                     # Entry point
+│   ├── index.html
+│   └── .env                         # Environment variables
+│
+├── vite.config.js
+├── package.json
+└── .gitignore
+```
+
+## Component Architecture
+
+### 1. Common Components (Shared Layout)
+
+**Header Component**
+```jsx
+// src/components/common/Header/Header.jsx
+- Logo
+- Search bar (mobile & desktop)
+- Navigation menu
+- User profile dropdown
+- Sticky positioning on scroll
+- Mobile hamburger menu
+```
+
+**Navigation Component**
+```jsx
+// src/components/common/Navigation/Navigation.jsx
+- Links to main pages
+- Active state highlighting
+- Responsive menu collapse
+- Search suggestions
+```
+
+**Footer Component**
+```jsx
+// src/components/common/Footer/Footer.jsx
+- Company info
+- Links by category
+- Newsletter signup
+- Social media links
+- App store badges
+- Copyright info
+```
+
+### 2. Shared UI Components (Reusable Primitives)
+
+```jsx
+// Button with variants
+<Button 
+  variant="primary" | "secondary" | "outline" | "text"
+  size="sm" | "md" | "lg"
+  fullWidth
+  disabled
+  loading
+/>
+
+// Input field with states
+<Input 
+  label="Email"
+  value=""
+  onChange={}
+  placeholder=""
+  error="Error message"
+  success="Success message"
+  status="default" | "error" | "success" | "warning"
+/>
+
+// Card with elevation
+<Card 
+  variant="elevated" | "outlined" | "flat"
+  className=""
+>
+  <Card.Header>Title</Card.Header>
+  <Card.Body>Content</Card.Body>
+  <Card.Footer>Actions</Card.Footer>
+</Card>
+
+// Modal dialog
+<Modal 
+  isOpen={open}
+  onClose={onClose}
+  title="Modal Title"
+/>
+
+// Badge for status
+<Badge 
+  variant="primary" | "secondary" | "success" | "error"
+  size="sm" | "md" | "lg"
+/>
+
+// Toast notifications
+useToast().show({
+  message: "Booking successful!",
+  type: "success",
+  duration: 3000
+})
+
+// Spinner/Loader
+<Spinner size="sm" | "md" | "lg" />
+```
+
+### 3. Search Components
+
+```jsx
+// SearchHero.jsx - Hero section with search
+- Location autocomplete input
+- Check-in date picker
+- Check-out date picker
+- Guests selector
+- Search button
+
+// FilterSidebar.jsx - Left sidebar filters
+- Price range slider
+- Star rating checkboxes
+- Amenities multi-select
+- Hotel type filter
+- Distance slider
+- User rating filter
+
+// SortOptions.jsx - Sorting dropdown
+- Recommended
+- Price: Low to High
+- Price: High to Low
+- Rating: High to Low
+- Newest
+```
+
+### 4. Hotel Components
+
+```jsx
+// HotelCard.jsx
+- Image carousel
+- Hotel name & location
+- Rating & review count
+- Key amenities (icons)
+- Price per night
+- Discount badge
+- Favorite/save button
+- Click handler to details page
+
+// HotelGallery.jsx
+- Large main image (60%)
+- Thumbnail strip
+- Image counter
+- Full-screen toggle
+- Share button
+
+// RoomCard.jsx
+- Room image
+- Room type name
+- Occupancy & bed type
+- Room size
+- Key features
+- Price options
+- Select button
+
+// ReviewSection.jsx
+- Rating filter
+- Sort options
+- Review cards with:
+  - User name & avatar
+  - Rating stars
+  - Date posted
+  - Review text (expandable)
+  - Helpful votes
+```
+
+### 5. Booking Components
+
+```jsx
+// BookingForm.jsx
+- Multi-step form
+- Validation feedback
+- Progress indicator
+- Back/Next buttons
+
+// GuestDetails.jsx (Step 1)
+- Full name
+- Email
+- Phone
+- Address
+- Special requests
+
+// PaymentForm.jsx (Step 2)
+- Card input (with formatting)
+- Expiry date
+- CVV
+- Billing address
+- Promo code field
+- Summary box
+
+// BookingSummary.jsx (Sidebar)
+- Check-in/out dates
+- Number of nights
+- Price breakdown
+- Taxes & fees
+- Total amount
+- Book button
+
+// RoomSelector.jsx
+- Room type selection
+- Rate type (refundable/non-refundable)
+- Quantity selector
+- Cancellation policy
+```
+
+## State Management Strategy
+
+### Context API Setup
+
+```jsx
+// AuthContext.js
+{
+  user: {
+    id, email, name, phone, preferences
+  },
+  token: "jwt_token",
+  loading: false,
+  error: null,
+  login: (email, password) => {},
+  register: (userData) => {},
+  logout: () => {},
+  updateProfile: (userData) => {}
+}
+
+// BookingContext.js
+{
+  searchParams: {
+    location, checkIn, checkOut, guests
+  },
+  selectedHotel: { id, name, price },
+  selectedRoom: { id, type, price },
+  guestDetails: { name, email, phone, address },
+  bookingId: "confirmation_id",
+  loading: false,
+  setSearchParams: () => {},
+  setSelectedHotel: () => {},
+  setSelectedRoom: () => {},
+  confirmBooking: () => {}
+}
+
+// FilterContext.js
+{
+  filters: {
+    priceRange: [0, 10000],
+    ratings: [],
+    amenities: [],
+    hotelType: [],
+    distance: 50
+  },
+  sort: "recommended",
+  setFilters: () => {},
+  setSort: () => {}
+}
+```
+
+## API Structure
+
+### auth.js
+```javascript
+export const authAPI = {
+  login: (email, password) => POST /auth/login,
+  register: (userData) => POST /auth/register,
+  logout: () => POST /auth/logout,
+  refreshToken: () => POST /auth/refresh,
+  updateProfile: (userId, data) => PUT /users/{id},
+}
+```
+
+### hotels.js
+```javascript
+export const hotelsAPI = {
+  search: (filters) => GET /hotels?location=&checkIn=&checkOut=,
+  getById: (id) => GET /hotels/{id},
+  getReviews: (id) => GET /hotels/{id}/reviews,
+  getRooms: (id) => GET /hotels/{id}/rooms,
+  getAmenities: (id) => GET /hotels/{id}/amenities,
+}
+```
+
+### bookings.js
+```javascript
+export const bookingsAPI = {
+  create: (data) => POST /bookings,
+  getAll: (userId) => GET /bookings?userId=,
+  getById: (id) => GET /bookings/{id},
+  cancel: (id) => DELETE /bookings/{id},
+  update: (id, data) => PUT /bookings/{id},
+}
+```
+
+## Hooks Implementation
+
+```javascript
+// useAuth.js - Authentication
+const useAuth = () => {
+  const { user, login, register, logout, loading, error }
+  return { user, login, register, logout, loading, error }
+}
+
+// useBooking.js - Booking state
+const useBooking = () => {
+  const { booking, setBooking, confirmBooking, cancelBooking }
+  return { booking, setBooking, confirmBooking, cancelBooking }
+}
+
+// useFetch.js - API calls
+const useFetch = (url, options) => {
+  const { data, loading, error, refetch }
+  return { data, loading, error, refetch }
+}
+
+// useForm.js - Form handling
+const useForm = (initialState, onSubmit) => {
+  const { values, errors, touched, handleChange, handleSubmit }
+  return { values, errors, touched, handleChange, handleSubmit }
+}
+
+// useDebounce.js - Debouncing
+const useDebounce = (value, delay) => {
+  const debouncedValue = ...
+  return debouncedValue
+}
+
+// useLocalStorage.js - Persistence
+const useLocalStorage = (key, initialValue) => {
+  const [value, setValue] = ...
+  return [value, setValue]
+}
+```
+
+## Routing Structure
+
+```jsx
+// App.jsx
+<BrowserRouter>
+  <Routes>
+    {/* Public Routes */}
+    <Route path="/" element={<Home />} />
+    <Route path="/hotels" element={<HotelListing />} />
+    <Route path="/hotels/:id" element={<HotelDetails />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
+    
+    {/* Protected Routes */}
+    <Route element={<ProtectedRoute />}>
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/confirmation/:id" element={<Confirmation />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/bookings" element={<Bookings />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/settings" element={<Settings />} />
+    </Route>
+
+    {/* Admin Routes */}
+    <Route element={<AdminRoute />}>
+      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/hotels" element={<HotelsAdmin />} />
+      <Route path="/admin/rooms" element={<RoomsAdmin />} />
+      <Route path="/admin/bookings" element={<BookingsAdmin />} />
+      <Route path="/admin/users" element={<UsersAdmin />} />
+    </Route>
+
+    {/* Error Routes */}
+    <Route path="/404" element={<NotFound />} />
+    <Route path="/500" element={<ServerError />} />
+    <Route path="*" element={<Navigate to="/404" />} />
+  </Routes>
+</BrowserRouter>
+```
+
+## Responsive Breakpoints
+
+```css
+/* Mobile First */
+/* Mobile: 320px - 639px */
+/* Tablet: 640px - 1023px */
+/* Desktop: 1024px - 1279px */
+/* Large Desktop: 1280px+ */
+
+@media (min-width: 640px) { /* Tablet */ }
+@media (min-width: 1024px) { /* Desktop */ }
+@media (min-width: 1280px) { /* Large */ }
+```
+
+## Performance Optimization
+
+1. **Code Splitting**
+   - Lazy load pages with React.lazy()
+   - Separate admin and public bundles
+
+2. **Image Optimization**
+   - Use WebP format with fallbacks
+   - Lazy load images with Intersection Observer
+   - Compress images before upload
+
+3. **API Optimization**
+   - Cache API responses
+   - Debounce search inputs
+   - Pagination for lists
+   - Request cancellation on unmount
+
+4. **Bundle Optimization**
+   - Tree shaking unused code
+   - Minify CSS/JS
+   - Compress assets
+   - Use CDN for static files
+
+## Testing Strategy
+
+```javascript
+// Unit Tests (Jest + React Testing Library)
+// src/components/__tests__/Button.test.jsx
+describe('Button Component', () => {
+  test('renders with correct text', () => {})
+  test('calls onClick handler', () => {})
+  test('disables when disabled prop is true', () => {})
+})
+
+// Integration Tests
+// src/pages/__tests__/Login.test.jsx
+describe('Login Page', () => {
+  test('form submission calls API', () => {})
+  test('displays error on failed login', () => {})
+  test('redirects on successful login', () => {})
+})
+
+// E2E Tests (Playwright/Cypress)
+// tests/e2e/booking.spec.js
+describe('Booking Flow', () => {
+  test('complete hotel booking journey', () => {})
+  test('save hotel for later', () => {})
+  test('apply discount code', () => {})
+})
+```
+
+## Development Workflow
+
+1. **Feature Development**
+   - Create feature branch
+   - Develop components
+   - Test functionality
+   - Submit PR for review
+
+2. **Code Quality**
+   - ESLint for code style
+   - Prettier for formatting
+   - Husky for git hooks
+   - Pre-commit tests
+
+3. **Deployment**
+   - Build optimized bundle
+   - Run tests before deploy
+   - Deploy to staging
+   - Run E2E tests
+   - Deploy to production
+
+This architecture ensures:
+- **Scalability** - Easy to add new features
+- **Maintainability** - Clear folder structure
+- **Reusability** - Component composition
+- **Performance** - Optimized loading
+- **Accessibility** - WCAG compliance
+- **Mobile-first** - Responsive design
